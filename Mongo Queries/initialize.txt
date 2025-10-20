@@ -1,0 +1,4 @@
+Load the sanitized the MBPP sanitized problem set to the collection
+Transform the dataset into Functions collection by running initialize.py it will read the sanitized json and create the collection in the local MongoDB instance by default. (We can later point it to the remote instance as well)
+Then run the code you want to execute on the table.
+

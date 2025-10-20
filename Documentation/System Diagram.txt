@@ -1,0 +1,38 @@
+graph TD
+    subgraph System for The Post-Condition Auditor
+        A[Curated MBPP Functions]
+        
+        subgraph Prompting and Generation
+            B1[Naive Prompts]
+            B2[Few-Shot Prompts]
+            B3[Chain-of-Thought (CoT) Prompts]
+            C[LLM API]
+        end
+        
+        subgraph Tripartite Evaluation Framework
+            D1[Correctness (Validity) | hypothesis]
+            D2[Completeness (Strength) | mutmut]
+            D3[Soundness (Reliability) | ast library]
+        end
+
+        E[Data Analysis & Reporting | pandas, seaborn]
+        F[Final Output: Software System & Comprehensive Project Report]
+
+        A -->|Function Input| B1
+        A -->|Function Input| B2
+        A -->|Function Input| B3
+
+        B1 -->|Generated Postconditions| C
+        B2 -->|Generated Postconditions| C
+        B3 -->|Generated Postconditions| C
+        
+        C --(Naive Postconditions)--> D1
+        C --(Few-Shot Postconditions)--> D2
+        C --(CoT Postconditions)--> D3
+        
+        D1 -->|Metrics Data| E
+        D2 -->|Metrics Data| E
+        D3 -->|Metrics Data| E
+        
+        E --> F
+    end
