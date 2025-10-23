@@ -1,0 +1,1 @@
+How can I generate the postconditions for a python function using the Chain of thought prompting strategy?, I need the post conditions in a JSON format with Description and their corresponding assert statements. Also, should I also send the function Description here?,
