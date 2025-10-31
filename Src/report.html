@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Postcondition Auditor — Prompts Report</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="report.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>Postcondition Auditor — Prompts Report</h1>
+            <p class="lead">View and manage prompt documents stored in MongoDB (via API).</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="grid">
+            <div>
+                <div class="card">
+                    <div class="controls">
+                        <div style="flex:1">
+                            <strong>Overview</strong>
+                            <div class="small">Prompts from FunctionPrompts collection</div>
+                        </div>
+
+                        <label class="small">Strategy</label>
+                        <select id="strategyFilter">
+                            <option value="all">All</option>
+                            <option value="Naive_strategy">Naive</option>
+                            <option value="FewShot_strategy">Few-Shot</option>
+                            <option value="CoT_strategy">CoT</option>
+                        </select>
+
+                        <input id="searchInput" placeholder="Search Prompt_ID / Function_ID..." class="search" />
+                        <button id="downloadCsv" class="download-btn">Download CSV</button>
+                    </div>
+
+                    <hr />
+
+                    <div class="summary-row" id="summaryMetrics"></div>
+
+                    <div class="chart-wrap card">
+                        <canvas id="summaryChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card table-card">
+                    <strong>Detailed prompts</strong>
+                    <div class="small">Click row → manage prompt. Use controls to filter.</div>
+                    <div class="table-wrapper">
+                        <table id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th>Prompt ID</th>
+                                    <th>Function ID</th>
+                                    <th>Strategy</th>
+                                    <th>Correctness</th>
+                                    <th>Mutation</th>
+                                    <th>Hallucination</th>
+                                    <th>Postconditions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <aside>
+                <div class="card">
+                    <strong>Actions</strong>
+                    <p class="small">Create or update prompts in the database.</p>
+                    <hr />
+                    <div class="buttons">
+                        <button id="createPromptBtn">Create Prompt</button>
+                        <button id="refreshBtn">Refresh</button>
+                    </div>
+
+                    <div style="margin-top:12px">
+                        <small class="small">When you click a table row, you can update scores or
+                            postconditions.</small>
+                    </div>
+
+                    <div class="footer">Frontend integrated with MongoDB prompt service.</div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script src="report.js"></script>
+</body>
+
+</html>
