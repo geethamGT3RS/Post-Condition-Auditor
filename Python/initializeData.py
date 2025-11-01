@@ -6,6 +6,9 @@ import json
 from config import get_db_client
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
+#from Python.createPYFiles 
+from createPYFiles import PythonFileCreator
+from generatePrompts import generateAllPrompts 
 
 def initializeFunctionsCollection():
     """
@@ -68,7 +71,7 @@ def initializeFunctionsCollection():
             "Function_Code": doc.get("code", ""),
             "Function_Imports": doc.get("test_imports", []),
             "Function_Test_Cases": doc.get("test_list", []),
-            "Function_Prompts": [],  # Initialize as empty list]
+            "Function_Prompts": [],  # Initialize as empty list
             # Add other fields as necessary
         })
     print(f"Transformed dataset into '{functions_collection_name}' collection with {num_of_records} records.")
@@ -76,6 +79,13 @@ def initializeFunctionsCollection():
     client.close()
     print("Connection to MongoDB closed.")  
     # Note: The connection is closed here for demonstration purposes. In a real application, you might want to keep it open for further operations.
+
+    # Initialize PythonFileCreator to create Python files from the Functions collection
+    python_file_creator = PythonFileCreator(base_path=os.path.join(os.getcwd(), "py_files"))
+    python_file_creator.process_functions()
+
+
+
     return True
 
 def initializeMBPPCollection(collection_name):
@@ -142,4 +152,7 @@ def initializeMBPPCollection(collection_name):
 
 # main function to run the initialization
 if __name__ == "__main__":
+    # Call initializeFunctionsCollection to create and populate the Functions collection
     initializeFunctionsCollection() 
+    # Call generateAllPrompts to populate Function_Prompts collection
+    generateAllPrompts()

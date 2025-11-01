@@ -82,6 +82,9 @@ def storeFunctionPrompt(function_id, prompt_text, prompt_strategy):
     if existing_prompt:
         return existing_prompt["Prompt_ID"]
 
+    #get the file_path from the function document
+    file_path = single_document.get("file_path", "")
+    
     # get the max prompt ID
     max_prompt = prompts_collection.find_one(sort=[("Prompt_ID", -1)])
     if max_prompt:
@@ -94,6 +97,7 @@ def storeFunctionPrompt(function_id, prompt_text, prompt_strategy):
         "Function_ID": function_id,
         "Prompt_Text": prompt_text,
         "Prompt_Strategy": prompt_strategy,
+        "file_path": file_path,
         "Post_Conditions": [],  # Initialize as empty list
         "Correctness_Score": 0.0,  # Initialize as 0.0
         "Mutation_Score": 0.0,  # Initialize as 0.0
