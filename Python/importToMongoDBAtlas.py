@@ -5,7 +5,7 @@ import os
 import certifi # Import the certifi library to fix SSL issues
 
 # --- Configuration ---
-ATLAS_CONNECTION_STRING = "mongodb+srv://sbidisha:welcomeback@cluster0.u3lljc6.mongodb.net/PostconditionsDB?retryWrites=true&w=majority&appName=Cluster0"
+ATLAS_CONNECTION_STRING = ""
 
 # This should match the DB name you want to import into
 DATABASE_NAME = "PostconditionsDB"
