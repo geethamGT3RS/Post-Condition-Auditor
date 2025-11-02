@@ -117,7 +117,7 @@ This script reads `sanitized-mbpp.json` from the `/Data` folder, processes it, a
 python Python/initializeData.py
 ```
 
-**What it does:** Creates the `Functions` collection in your database (**854 documents**).
+**What it does:** Creates the `Functions` collection in your database (**427 documents**).
 
 ---
 
@@ -129,7 +129,7 @@ This script reads each function from the database and generates prompts for each
 python Python/generatePrompts.py
 ```
 
-**What it does:** Creates the `FunctionPrompts` collection (**854 prompts × 2 strategies = 1708 documents**).
+**What it does:** Creates the `FunctionPrompts` collection (**427 prompts × 2 strategies = 854 documents**).
 
 ---
 
