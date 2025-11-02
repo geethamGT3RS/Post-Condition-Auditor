@@ -304,8 +304,10 @@ def updatePostConditions(prompt_id, post_conditions):
         raise TypeError("Post conditions must be a list")
     # Validate the post_conditions list elements
     for condition in post_conditions:
-        if not isinstance(condition, str):
-            raise ValueError("Each post condition must be a string")
+        if not (isinstance(condition, dict) and 
+                "description" in condition and 
+                "assert_statement" in condition):
+            raise ValueError("Each post_condition item must be a dictionary with 'description' and 'assert_statement' keys")
 
 
     # 1. Establish a connection to the MongoDB server
