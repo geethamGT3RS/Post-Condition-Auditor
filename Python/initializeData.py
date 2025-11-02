@@ -45,7 +45,7 @@ def initializeFunctionsCollection():
         print("Server not available")
         return False
     
-    print("Connected to MongoDB!")
+    #print("Connected to MongoDB!")
 
     single_document = mbpp_collection.find_one()  # Fetch a single document from the collection
     
@@ -77,7 +77,7 @@ def initializeFunctionsCollection():
     print(f"Transformed dataset into '{functions_collection_name}' collection with {num_of_records} records.")
     # Close the connection when done
     client.close()
-    print("Connection to MongoDB closed.")  
+    #print("Connection to MongoDB closed.")  
     # Note: The connection is closed here for demonstration purposes. In a real application, you might want to keep it open for further operations.
 
     # Initialize PythonFileCreator to create Python files from the Functions collection
@@ -143,9 +143,9 @@ def initializeMBPPCollection(collection_name):
     print(f"Loaded data into '{collection_name}' collection from '{json_file_path}'.")
     print(f"Number of records inserted: {collection.count_documents({})}")
     # Close the connection when done
-    print("Closing connection to MongoDB...")
+    #print("Closing connection to MongoDB...")
     client.close()
-    print("Connection to MongoDB closed.")  
+    #print("Connection to MongoDB closed.")
     # Note: The connection is closed here for demonstration purposes. In a real application, you might want to keep it open for further operations.
     return collection_name
    

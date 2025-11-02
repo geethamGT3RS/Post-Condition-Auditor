@@ -59,7 +59,7 @@ def storeFunctionPrompt(function_id, prompt_text, prompt_strategy):
     assert db is not None, f"Failed to access database: {db_name}"
     assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
     assert functions_collection is not None, f"Failed to access collection: {functions_collection}"
-    print("Connected to MongoDB!")
+    #print("Connected to MongoDB!")
     
     # Fetch the function document from the Functions collection
     single_document = functions_collection.find_one({"Function_ID": function_id})  # Fetch the function document from the Functions collection
@@ -112,7 +112,7 @@ def storeFunctionPrompt(function_id, prompt_text, prompt_strategy):
     )
     #close the connection
     client.close()
-    print("Connection to MongoDB closed.")
+    #print("Connection to MongoDB closed.")
 
     return prompt_document["Prompt_ID"] 
 
@@ -137,7 +137,7 @@ def getPromptbyPromptID(prompt_id):
     assert db is not None, f"Failed to access database: {db_name}"
     assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
    
-    print("Connected to MongoDB!")
+    #print("Connected to MongoDB!")
 
     # Fetch the prompt document from the FunctionPrompts collection
     prompt_document = prompts_collection.find_one({"Prompt_ID": prompt_id})  # Fetch the prompt document from the FunctionPrompts collection
@@ -147,7 +147,7 @@ def getPromptbyPromptID(prompt_id):
     print(prompt_document)  # Print the fetched document to verify the connection and data retrieval
     #close the connection
     client.close()  
-    print("Connection to MongoDB closed.")
+    #print("Connection to MongoDB closed.")
     return prompt_document
 
 def updateCorrectnessScore(prompt_id, correctness_score):
@@ -181,7 +181,7 @@ def updateCorrectnessScore(prompt_id, correctness_score):
     assert db is not None, f"Failed to access database: {db_name}"
     assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
 
-    print("Connected to MongoDB!")
+    #print("Connected to MongoDB!")
 
     # Update the correctness score of the prompt document
     result = prompts_collection.update_one(
@@ -194,7 +194,7 @@ def updateCorrectnessScore(prompt_id, correctness_score):
     print(f"Updated correctness score for prompt ID {prompt_id} to {correctness_score}.")
     #close the connection
     client.close()
-    print("Connection to MongoDB closed.")
+    #print("Connection to MongoDB closed.")
     return True
 
 def updateMutationScore(prompt_id, mutation_score):
@@ -228,7 +228,7 @@ def updateMutationScore(prompt_id, mutation_score):
     assert db is not None, f"Failed to access database: {db_name}"
     assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
 
-    print("Connected to MongoDB!")
+    #print("Connected to MongoDB!")
 
     # Update the mutation score of the prompt document
     result = prompts_collection.update_one(
@@ -241,7 +241,7 @@ def updateMutationScore(prompt_id, mutation_score):
     print(f"Updated mutation score for prompt ID {prompt_id} to {mutation_score}.")
     #close the connection
     client.close()
-    print("Connection to MongoDB closed.")
+    #print("Connection to MongoDB closed.")
     return True
 
 def updateHallucinationScore(prompt_id, hallucination_score):
@@ -275,7 +275,7 @@ def updateHallucinationScore(prompt_id, hallucination_score):
     assert db is not None, f"Failed to access database: {db_name}"
     assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
 
-    print("Connected to MongoDB!")
+    #print("Connected to MongoDB!")
 
     # Update the hallucination score of the prompt document
     result = prompts_collection.update_one(
@@ -288,7 +288,7 @@ def updateHallucinationScore(prompt_id, hallucination_score):
     print(f"Updated hallucination score for prompt ID {prompt_id} to {hallucination_score}.")
     #close the connection
     client.close()
-    print("Connection to MongoDB closed.")
+    #print("Connection to MongoDB closed.")
     return True
 
 def updatePostConditions(prompt_id, post_conditions):
@@ -323,7 +323,7 @@ def updatePostConditions(prompt_id, post_conditions):
     assert db is not None, f"Failed to access database: {db_name}"
     assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
 
-    print("Connected to MongoDB!")
+    #print("Connected to MongoDB!")
 
     # Update the post conditions list of the prompt document
     result = prompts_collection.update_one(
@@ -336,5 +336,5 @@ def updatePostConditions(prompt_id, post_conditions):
     print(f"Updated post conditions for prompt ID {prompt_id} to {post_conditions}.")
     #close the connection
     client.close()
-    print("Connection to MongoDB closed.")
+    #print("Connection to MongoDB closed.")
     return True

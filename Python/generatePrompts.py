@@ -24,7 +24,7 @@ def generateNaivePrompt(function_id):
     assert db is not None, f"Failed to access database: {db_name}"
     assert functions_collection is not None, f"Failed to access collection: {functions_collection}"
 
-    print("Connected to MongoDB!")
+    #print("Connected to MongoDB!")
 
     # Fetch the function document from the Functions collection
     function_document = functions_collection.find_one({"Function_ID": function_id})
@@ -38,18 +38,18 @@ def generateNaivePrompt(function_id):
 
     #close the connection
     client.close()
-    print("Connection to MongoDB closed for generateNaivePrompt.")
+    #print("Connection to MongoDB closed for generateNaivePrompt.")
      
 
     # Generate a simple prompt using the function description. Start the prompt with "provide the assert statements of the postconditions (in JSON format with the description and assert statement only) for a function to"
     # then append the function description's text after "function to" string. 
     function_description = function_description.replace("Write a function to", "")
     prompt_text = f"provide the assert statements of the postconditions (in JSON format with the description and assert statement only) for a function to{function_description}"
-    print(f"Generated Prompt: {prompt_text}")
+    #print(f"Generated Prompt: {prompt_text}")
     # Store the generated prompt in the Prompts collection
     prompt_id = Prompts.storeFunctionPrompt(function_id=function_id, prompt_text=prompt_text, prompt_strategy="Naive_strategy")
-    print(f"Stored Prompt ID: {prompt_id}")
-     
+    #print(f"Stored Prompt ID: {prompt_id}")
+
     return prompt_text
 
 def generateFewShotPrompt(function_id, num_examples=3):
@@ -77,7 +77,7 @@ def generateFewShotPrompt(function_id, num_examples=3):
     assert Prompts_collection is not None, f"Failed to access collection: {Prompts_collection}"
     assert Functions_collection is not None, f"Failed to access collection: {Functions_collection}"
 
-    print("Connected to MongoDB!")
+    #print("Connected to MongoDB!")
 
     # Check if FewShot strategy prompt already exists for the function ID in the Prompts collection
     existing_prompt = Prompts_collection.find_one({"Function_ID": function_id, "Prompt_Strategy": "FewShot_strategy"})
@@ -157,7 +157,7 @@ def generateFewShotPrompt(function_id, num_examples=3):
 
     #close the connection
     client.close()
-    print("Connection to MongoDB closed for generateFewShotPrompt.")
+    #print("Connection to MongoDB closed for generateFewShotPrompt.")
 
      
     # Start the prompt with "provide the assert statements of the postconditions (in JSON format with the description and assert statement only) for a function to"
@@ -175,11 +175,11 @@ def generateFewShotPrompt(function_id, num_examples=3):
             description = postcondition.get("description", "")
             assert_statement = postcondition.get("assert", "")
             prompt_text += f"- Description: {description}\n  Assert Statement: {assert_statement}\n"
-    print(f"Generated Few-Shot Prompt: {prompt_text} for function ID {function_id}")
+    #print(f"Generated Few-Shot Prompt: {prompt_text} for function ID {function_id}")
     
     # Store the generated prompt in the Prompts collection
     prompt_id = Prompts.storeFunctionPrompt(function_id=function_id, prompt_text=prompt_text, prompt_strategy="FewShot_strategy")
-    print(f"Stored Few-Shot Prompt ID: {prompt_id} for function ID {function_id}")
+    #print(f"Stored Few-Shot Prompt ID: {prompt_id} for function ID {function_id}")
 
 
     return prompt_text
@@ -206,7 +206,7 @@ def generateChainOfThoughtPrompt(function_id):
     assert db is not None, f"Failed to access database: {db_name}"
     assert functions_collection is not None, f"Failed to access collection: {functions_collection}"
 
-    print("Connected to MongoDB!")
+    #print("Connected to MongoDB!")
 
     # Fetch the function document from the Functions collection
     function_document = functions_collection.find_one({"Function_ID": function_id})
@@ -222,7 +222,7 @@ def generateChainOfThoughtPrompt(function_id):
 
     #close the connection
     client.close()  
-    print("Connection to MongoDB closed for generateChainOfThoughtPrompt.")
+    #print("Connection to MongoDB closed for generateChainOfThoughtPrompt.")
     
     # Generate a chain-of-thought prompt in the following format:
     # You are an expert software engineer tasked with generating verifiable postconditions for a given Python function. 
@@ -256,12 +256,12 @@ def generateChainOfThoughtPrompt(function_id):
        - `assert_statement`: The exact Python `assert` or `pytest.raises` statement needed to verify the condition.
     **Python Function:** {function_code}
     **Function Description: ** {function_description}"""
-    print(f"Generated Chain-of-Thought Prompt: {prompt_text} for function ID {function_id}")    
+    #print(f"Generated Chain-of-Thought Prompt: {prompt_text} for function ID {function_id}")    
     assert prompt_text is not None, "Failed to generate Chain-of-Thought prompt text."
 
     # Store the generated prompt in the Prompts collection
     prompt_id = Prompts.storeFunctionPrompt(function_id=function_id, prompt_text=prompt_text, prompt_strategy="ChainOfThought_strategy")
-    print(f"Stored Chain-of-Thought Prompt ID: {prompt_id} for function ID {function_id}")
+    #print(f"Stored Chain-of-Thought Prompt ID: {prompt_id} for function ID {function_id}")
 
     return prompt_text
 
@@ -282,8 +282,8 @@ def generateAllPrompts():
     assert db is not None, f"Failed to access database: {db_name}"
     assert functions_collection is not None, f"Failed to access collection: {functions_collection}"
 
-    print("Connected to MongoDB to create prompts!")
-    
+    #print("Connected to MongoDB to create prompts!")
+    print("Starting to create prompts for all functions...")
 
 
     # Get all function IDs from the Functions collection
