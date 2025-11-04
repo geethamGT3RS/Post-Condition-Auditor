@@ -144,6 +144,12 @@ python Python/llm_integration.py
 **What it does:** Fills empty `Post_Conditions` arrays in the `FunctionPrompts` collection with responses from the LLM.  
 *(Takes a long time to complete.)*
 
+Run 
+```
+python Python/createFewShotPrompts.py
+```
+**What it does:** creates the few shots prompts for the LLM. Again run the LLM integration script to get the post conditions.
+
 ---
 
 ### Step 4: Run Static Analysis (Hallucination Audit)
