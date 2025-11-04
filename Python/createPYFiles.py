@@ -92,6 +92,9 @@ class PythonFileCreator:
         if not isinstance(file_path, str):
             file_path = str(file_path)
 
+        # convert the absolute file_path to relative path from base_path
+        file_path = os.path.relpath(file_path, self.base_path)
+
         #Create MongoDB query to update the file_path for the given function_id
         query = {"Function_ID": function_id}
         # Create MongoDB update to set the file_path
