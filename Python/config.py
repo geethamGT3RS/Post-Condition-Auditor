@@ -24,18 +24,18 @@ def initialize_db_client():
     #client = MongoClient(DATABASE_URL)
     # 1. Establish a connection to the MongoDB server
     # Replace the connection string with your actual URI (e.g., 'mongodb://localhost:27017/')
-    Mongo_URI = input("Enter MongoDB URI (default: 'mongodb://localhost:27017/'): ")
-    if not Mongo_URI:
-        Mongo_URI = 'mongodb://localhost:27017/'
-
-    input("Press Enter to connect to MongoDB...")  # Pause for user input before connecting
+    Mongo_URI = DATABASE_URL
+     # Extract the database name from the URL path, or use the default
+    try:
+        db_name_from_url = Mongo_URI.split('/')[-1].split('?')[0]
+        if not db_name_from_url:
+            raise ValueError("No DB name in URI path")
+        db_name = db_name_from_url
+    except Exception:
+        db_name = "PostconditionsDB" # Default fallback
+        
+    print(f"Connecting to MongoDB at {Mongo_URI} (Database: {db_name})")
     client = MongoClient(Mongo_URI)
-
-    # 2. Get and Select the database and the collection
-    # If the database or collection doesn't exist, MongoDB creates it upon first write.
-    db_name = input("Enter the database name (default: 'PostconditionsDB'): ")
-    if not db_name:
-        db_name = "PostconditionsDB"
     db = client[db_name]         # Use the user-provided database name
     return client, db
 

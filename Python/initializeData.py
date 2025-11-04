@@ -103,15 +103,13 @@ def initializeMBPPCollection(collection_name):
     
     client, db = get_db_client()
 
-    # Get the JSON file path from user
-    json_file_path = input("Enter the path to the JSON file (default: '../Data/sanitized-mbpp.json'): ")
-    if not json_file_path:
-        # Get the directory of the current Python script (e.g., /ProjectRoot/Python)
-        current_dir = os.path.dirname(os.path.abspath(__file__))
+   
+    # Get the directory of the current Python script (e.g., /ProjectRoot/Python)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
         
-        # Go up one level to ProjectRoot, then into the 'data' folder
-        data_dir = os.path.join(current_dir, '..', 'data')
-        json_file_path = os.path.join(data_dir, "sanitized-mbpp.json")
+    # Go up one level to ProjectRoot, then into the 'data' folder
+    data_dir = os.path.join(current_dir, '..', 'Data')
+    json_file_path = os.path.join(data_dir, "sanitized-mbpp.json")
 
     json_file_path = os.path.abspath(json_file_path)  # Get absolute path
     print(f"Using JSON file path: {json_file_path}")
