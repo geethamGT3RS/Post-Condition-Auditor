@@ -77,7 +77,8 @@ class AssertIdentifierExtractor(ast.NodeVisitor):
     def visit_Call(self, node):
         # Find the function name, e.g., `similar_elements(...)`
         if isinstance(node.func, ast.Name) and self.function_name is None:
-             # This is likely the function being called/tested
+             # This is a basic way to find the function being tested.
+             # It assumes the first function call is the one we care about.
              self.function_name = node.func.id
         self.generic_visit(node)
 
@@ -157,7 +158,7 @@ def run_hallucination_audit(prompt_id: int):
     hallucination_found = False
     
     print(f"--- Auditing Prompt ID {prompt_id} (Function ID {function_id}) ---")
-    print(f"Valid Identifiers: {valid_identifiers}")
+    # print(f"Valid Identifiers: {valid_identifiers}") # <-- Too verbose, uncomment for deep debugging
 
     for i, condition in enumerate(post_conditions):
         assert_statement = condition.get("assert_statement")
@@ -175,13 +176,15 @@ def run_hallucination_audit(prompt_id: int):
         
         if hallucinated_vars:
             print(f"  [Condition {i+1} FAILED]: Hallucinated vars: {hallucinated_vars}")
-            hallucination_found = True # Mark as True if any hallucination is found
+            hallucination_found = True # Mark as True if *any* hallucination is found
         else:
             print(f"  [Condition {i+1} PASSED]: Used: {used_identifiers}")
 
     # 5. Calculate and store the score
-    # Score = 1.0 if hallucinations were found, 0.0 if not.
-    hallucination_score = 1.0 if hallucination_found else 0.0
+    # **CORRECTED LOGIC:**
+    # Score = 0.0 if hallucinations were found (Bad)
+    # Score = 1.0 if no hallucinations were found (Good)
+    hallucination_score = 0.0 if hallucination_found else 1.0
     
     try:
         Prompts.updateHallucinationScore(prompt_id, hallucination_score)
@@ -194,21 +197,20 @@ def run_hallucination_audit(prompt_id: int):
 def run_full_audit():
     """
     Runs the hallucination audit on all prompts that have post-conditions
-    but have not yet been audited (score is default 0.0).
+    but have not yet been audited (score is default -1.0).
     """
     client, db = get_db_client()
     prompts_collection = db["FunctionPrompts"]
     
-    # Find prompts that have post-conditions and default score
+    # **CORRECTED QUERY:**
+    # Find prompts that have post-conditions and the default (unaudited) score
     prompts_to_audit = list(prompts_collection.find({
         "Post_Conditions": {"$ne": []},
-        "Hallucination_Score": 0.0 
-        # Note: This will re-audit correct (0.0) prompts.
-        # A better flag would be "audited_soundness": false
+        "Hallucination_Score": -1.0 
     }))
     
     prompt_ids = [p["Prompt_ID"] for p in prompts_to_audit]
-    print(f"Found {len(prompt_ids)} prompts with post-conditions to audit.")
+    print(f"Found {len(prompt_ids)} prompts with post-conditions to audit for soundness.")
     client.close() # Close this client, as run_hallucination_audit will open its own
 
     for prompt_id in prompt_ids:
@@ -217,6 +219,20 @@ def run_full_audit():
     print("Static Analysis (Hallucination Audit) finished.")
 
 if __name__ == "__main__":
-    print("Starting Static Analysis (Hallucination Audit) Module...")
-    # To run the full audit, you would call:
+    print("Starting Static Analysis (HallucAination Audit) Module...")
+    # Initialize all default scores to -1.0 before running
+    # This is a one-time operation to fix old data
+    try:
+        client, db = get_db_client()
+        print("Initializing any 0.0 scores to -1.0 to ensure they are audited...")
+        result = db["FunctionPrompts"].update_many(
+            {"Hallucination_Score": 0.0},
+            {"$set": {"Hallucination_Score": -1.0}}
+        )
+        print(f"Initialization complete. Updated {result.modified_count} documents.")
+        client.close()
+    except Exception as e:
+        print(f"DB init error: {e}")
+
+    # Run the full audit
     run_full_audit()

@@ -6,7 +6,7 @@ The focus is on **automated software verification**, measuring prompt strategies
 Each function from the **MBPP** dataset is evaluated through a three-track system:
 
 - **Correctness (PBT):** Are the post-conditions valid?  
-- **Completeness (Mutation Analysis):** Do the post-conditions catch bugs?  
+- **Completeness (Mutation Analysis):** Are the LLM's assert statements strong enough to actually catch bugs?  
 - **Soundness (Static Analysis):** Are the post-conditions free of hallucinated variables?
 
 This repository contains the complete pipeline for **data ingestion**, **prompt generation**, **LLM interaction**, and **results auditing**.
