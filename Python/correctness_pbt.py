@@ -184,8 +184,6 @@ def run_full_correctness_audit():
     # 3. Have not been scored for correctness yet (Score = -1.0)
     prompts_to_audit = list(prompts_collection.find({
         "Post_Conditions": {"$ne": []},
-        "Hallucination_Score": 1.0,
-        "Correctness_Score": -1.0
     }))
     
     prompt_ids = [p["Prompt_ID"] for p in prompts_to_audit]
