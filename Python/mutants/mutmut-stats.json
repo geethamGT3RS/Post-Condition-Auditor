@@ -1,0 +1,11 @@
+{
+    "tests_by_mangled_function_name": {
+        "py_files.func_1.x_similar_elements": [
+            "test_generated_mutation.py::test_llm_generated_postconditions"
+        ]
+    },
+    "duration_by_test": {
+        "test_generated_mutation.py::test_llm_generated_postconditions": 0.0001104160000977572
+    },
+    "stats_time": 0.37974669399999994
+}

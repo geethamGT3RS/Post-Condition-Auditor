@@ -1,0 +1,12 @@
+{
+    "exit_code_by_key": {
+        "py_files.func_4.x_is_Power_Of_Two__mutmut_1": 33,
+        "py_files.func_4.x_is_Power_Of_Two__mutmut_2": 33,
+        "py_files.func_4.x_is_Power_Of_Two__mutmut_3": 33,
+        "py_files.func_4.x_is_Power_Of_Two__mutmut_4": 33,
+        "py_files.func_4.x_is_Power_Of_Two__mutmut_5": 33,
+        "py_files.func_4.x_differ_At_One_Bit_Pos__mutmut_1": 33,
+        "py_files.func_4.x_differ_At_One_Bit_Pos__mutmut_2": 33
+    },
+    "hash_by_function_name": {}
+}

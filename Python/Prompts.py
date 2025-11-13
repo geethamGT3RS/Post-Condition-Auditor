@@ -1,4 +1,3 @@
-
 from pymongo import MongoClient
 from config import get_db_client
 
@@ -95,6 +94,7 @@ def storeFunctionPrompt(function_id, prompt_text, prompt_strategy):
         "Prompt_Text": prompt_text,
         "Prompt_Strategy": prompt_strategy,
         "Post_Conditions": [],  # Initialize as empty list
+        "Pre_Conditions": [],  # Initialize as empty list
         "Correctness_Score": 0.0,  # Initialize as 0.0
         "Mutation_Score": 0.0,  # Initialize as 0.0
         "Hallucination_Score": 0.0,  # Initialize as 0.0
@@ -179,15 +179,28 @@ def updateCorrectnessScore(prompt_id, correctness_score):
 
     print("Connected to MongoDB!")
 
+    # First check if the document exists
+    existing_doc = prompts_collection.find_one({"Prompt_ID": prompt_id})
+    if not existing_doc:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+
     # Update the correctness score of the prompt document
     result = prompts_collection.update_one(
         {"Prompt_ID": prompt_id},
         {"$set": {"Correctness_Score": correctness_score}}
     )
+    
+    # Only raise error if document wasn't found
+    if result.matched_count == 0:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+    
     if result.modified_count == 0:
-        raise ValueError(f"Prompt with ID {prompt_id} not found or score is the same.")
-
-    print(f"Updated correctness score for prompt ID {prompt_id} to {correctness_score}.")
+        print(f"Correctness score for prompt ID {prompt_id} is already {correctness_score} (no change needed).")
+    else:
+        print(f"Updated correctness score for prompt ID {prompt_id} to {correctness_score}.")
+    
     #close the connection
     client.close()
     print("Connection to MongoDB closed.")
@@ -226,15 +239,28 @@ def updateMutationScore(prompt_id, mutation_score):
 
     print("Connected to MongoDB!")
 
+    # First check if the document exists
+    existing_doc = prompts_collection.find_one({"Prompt_ID": prompt_id})
+    if not existing_doc:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+
     # Update the mutation score of the prompt document
     result = prompts_collection.update_one(
         {"Prompt_ID": prompt_id},
         {"$set": {"Mutation_Score": mutation_score}}
     )
+    
+    # Only raise error if document wasn't found
+    if result.matched_count == 0:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+    
     if result.modified_count == 0:
-        raise ValueError(f"Prompt with ID {prompt_id} not found or score is the same.")
-
-    print(f"Updated mutation score for prompt ID {prompt_id} to {mutation_score}.")
+        print(f"Mutation score for prompt ID {prompt_id} is already {mutation_score} (no change needed).")
+    else:
+        print(f"Updated mutation score for prompt ID {prompt_id} to {mutation_score}.")
+    
     #close the connection
     client.close()
     print("Connection to MongoDB closed.")
@@ -273,15 +299,28 @@ def updateHallucinationScore(prompt_id, hallucination_score):
 
     print("Connected to MongoDB!")
 
+    # First check if the document exists
+    existing_doc = prompts_collection.find_one({"Prompt_ID": prompt_id})
+    if not existing_doc:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+
     # Update the hallucination score of the prompt document
     result = prompts_collection.update_one(
         {"Prompt_ID": prompt_id},
         {"$set": {"Hallucination_Score": hallucination_score}}
     )
+    
+    # Only raise error if document wasn't found
+    if result.matched_count == 0:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+    
     if result.modified_count == 0:
-        raise ValueError(f"Prompt with ID {prompt_id} not found or score is the same.")
-
-    print(f"Updated hallucination score for prompt ID {prompt_id} to {hallucination_score}.")
+        print(f"Hallucination score for prompt ID {prompt_id} is already {hallucination_score} (no change needed).")
+    else:
+        print(f"Updated hallucination score for prompt ID {prompt_id} to {hallucination_score}.")
+    
     #close the connection
     client.close()
     print("Connection to MongoDB closed.")
@@ -323,15 +362,28 @@ def updatePostConditions(prompt_id, post_conditions):
 
     print("Connected to MongoDB!")
 
+    # First check if the document exists
+    existing_doc = prompts_collection.find_one({"Prompt_ID": prompt_id})
+    if not existing_doc:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+
     # Update the post conditions list of the prompt document
     result = prompts_collection.update_one(
         {"Prompt_ID": prompt_id},
         {"$set": {"Post_Conditions": post_conditions}}
     )
+    
+    # Only raise error if document wasn't found
+    if result.matched_count == 0:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+    
     if result.modified_count == 0:
-        raise ValueError(f"Prompt with ID {prompt_id} not found or post conditions are the same.")
-
-    print(f"Updated post conditions for prompt ID {prompt_id} to {post_conditions}.")
+        print(f"Post conditions for prompt ID {prompt_id} are already the same (no change needed).")
+    else:
+        print(f"Updated post conditions for prompt ID {prompt_id}.")
+    
     #close the connection
     client.close()
     print("Connection to MongoDB closed.")
