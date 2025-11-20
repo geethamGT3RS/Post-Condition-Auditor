@@ -1,4 +1,5 @@
 import ast
+from typing import Tuple, Optional
 from pymongo import MongoClient
 import builtins  # To get a list of built-in functions
 
@@ -87,8 +88,7 @@ class AssertIdentifierExtractor(ast.NodeVisitor):
         if isinstance(node.ctx, ast.Load):
             self.used_identifiers.add(node.id)
         self.generic_visit(node)
-
-def get_assert_identifiers(assert_statement: str) -> (set, str | None):
+def get_assert_identifiers(assert_statement: str) -> Tuple[set, Optional[str]]:
     """
     Parses an assert statement and returns a set of used identifier names
     and the name of the function being tested.

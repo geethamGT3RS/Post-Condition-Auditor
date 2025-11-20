@@ -43,8 +43,10 @@ def generateNaivePrompt(function_id):
 
     # Generate a simple prompt using the function description. Start the prompt with "provide the assert statements of the postconditions (in JSON format with the description and assert statement only) for a function to"
     # then append the function description's text after "function to" string. 
-    function_description = function_description.replace("Write a function to", "")
-    prompt_text = f"provide the assert statements of the postconditions (in JSON format with the description and assert statement only) for a function to{function_description}"
+    function_description = function_description.replace("Write a function to", " ")
+    function_description = function_description.replace("Write a python function to", " ")
+    #print(f"Function Description for Prompt Generation: {function_description}")
+    prompt_text = f"provide the preconditions and postconditions  for a function to {function_description} to test this function holistically."
     print(f"Generated Prompt: {prompt_text}")
     # Store the generated prompt in the Prompts collection
     prompt_id = Prompts.storeFunctionPrompt(function_id=function_id, prompt_text=prompt_text, prompt_strategy="Naive_strategy")
@@ -112,7 +114,7 @@ def generateFewShotPrompt(function_id, num_examples=3):
                 "$project": {
                     "_id": 0,
                     "Function_ID": 1,
-                    "Post_Conditions": 1
+                    "raw_reasoning": 1
                 }
             }
         ]))
@@ -131,7 +133,8 @@ def generateFewShotPrompt(function_id, num_examples=3):
             {"_id": 0, "Function_Description": 1}
         )
         example["Function_Description"] = function_doc.get("Function_Description", "") if function_doc else ""
-        example["Function_Postconditions"] = example.pop("Post_Conditions", [])
+        example["raw_reasoning"] = example.pop("raw_reasoning", [])
+        # example["Function_Preconditions"] = example.pop("Pre_Conditions", [])
         # Store the example function ID with a different key name to avoid confusion
         example["Example_Function_ID"] = example.pop("Function_ID")
 
@@ -149,19 +152,20 @@ def generateFewShotPrompt(function_id, num_examples=3):
      
     # Start the prompt with "provide the assert statements of the postconditions (in JSON format with the description and assert statement only) for a function to"
     # then append the function description's text after "function to" string. 
-    prompt_text = f"provide the assert statements of the postconditions (in JSON format with the description and assert statement only) for a function to perform the following task:\n{function_description}\n\n"
+    prompt_text = f"provide the the preconditions and postconditions for a function to perform the following task to test the function holistically:\n{function_description}\n\n"
     
-    prompt_text += "Here are some examples of the postconditions:\n"
+    prompt_text += "Here are some examples of the postcondition analysis are:\n"
     
     for example in example_documents:
         example_description = example.get("Function_Description", "")
-        example_postconditions = example.get("Function_Postconditions", [])
+        example_raw_reasoning = example.get("raw_reasoning", [])
         
-        prompt_text += f"\nFunction Description:\n{example_description}\nPostconditions:\n"
-        for postcondition in example_postconditions:
-            description = postcondition.get("description", "")
-            assert_statement = postcondition.get("assert_statement", "")
-            prompt_text += f"- Description: {description}\n  Assert Statement: {assert_statement}\n"
+        prompt_text += f"\nFunction Description:\n{example_description}\nAnalysis\n"
+        for reasoning in example_raw_reasoning:
+            prompt_text += f"- {reasoning}\n"
+            # description = postcondition.get("description", "")
+            # assert_statement = postcondition.get("assert_statement", "")
+            # prompt_text += f"- Description: {description}\n  Assert Statement: {assert_statement}\n"
     
     print(f"Generated Few-Shot Prompt for function ID {function_id}")
     
@@ -213,7 +217,7 @@ def generateChainOfThoughtPrompt(function_id):
     client.close()  
     print("Connection to MongoDB closed for generateChainOfThoughtPrompt.")
     
-    prompt_text = f"""You are an expert software engineer tasked with generating verifiable postconditions for a given Python function. 
+    prompt_text = f"""You are an expert software engineer tasked with generating verifiable postconditions for a given Python function to test is holistically. 
     **Task:**
     1. **Analyze** the provided function code and its docstring. 
     2. **Apply Chain-of-Thought (CoT):** First , generate the intermediate analysis (Steps 1, 2, and 3 below). 
@@ -222,12 +226,13 @@ def generateChainOfThoughtPrompt(function_id):
     ** 1. **Analyze Inputs/Preconditions:** Identify parameter types and necessary input conditions. 
     2. **Trace Logic/Side Effects:** Describe the main calculation, control flow (if/else), and any external changes (side effects). 
     3. **Formulate Postconditions:** Draft the high-level facts about the return value and program state. 
-    **Required JSON Output Format:** 
-    The final output must be a single JSON object with a key `postconditions`. Each element in the list must have two keys: 
-       - `description`: A plain language statement of the condition (e.g., "The return value is an integer greater than 0."). 
-       - `assert_statement`: The exact Python `assert` or `pytest.raises` statement needed to verify the condition.
     **Python Function:** {function_code}
     **Function Description: ** {function_description}"""
+    #-----Deleted Prompt ---- #
+    # **Required JSON Output Format:** 
+    # The final output must be a single JSON object with a key `postconditions`. Each element in the list must have two keys: 
+    #    - `description`: A plain language statement of the condition (e.g., "The return value is an integer greater than 0."). 
+    #    - `assert_statement`: The exact Python `assert` or `pytest.raises` statement needed to verify the condition.
     print(f"Generated Chain-of-Thought Prompt for function ID {function_id}")    
     assert prompt_text is not None, "Failed to generate Chain-of-Thought prompt text."
 
@@ -271,6 +276,42 @@ def generateAllPrompts():
 
     print("Finished creating prompts for all functions.")
 
+
+#Funtion to Generate few shot prompts for all functions with 3 examples
+def generateFewShotPrompts(num_examples=3):
+    """
+    Create few-shot prompts for all functions in the Functions collection.
+    Example usage:
+    generateFewShotPrompts(num_examples=3)
+    """
+    #Connect to the database and get the Functions collection
+    client, db = get_db_client()
+    db_name = db.name
+    # create the functions collection if it doesn't exist
+    functions_collection = db["Functions"]
+    # Test the connection and data retrieval
+    assert client is not None, "Failed to connect to MongoDB"
+    assert db is not None, f"Failed to access database: {db_name}"
+    assert functions_collection is not None, f"Failed to access collection: {functions_collection}"
+
+    print("Connected to MongoDB to create few-shot prompts!")
+
+    # Get all function IDs from the Functions collection
+    function_ids = [function["Function_ID"] for function in functions_collection.find()]
+    
+    #close the connection
+    client.close()
+    print("Connection to MongoDB closed for generateFewShotPrompts.")
+    
+    # Generate few-shot prompts for each function ID
+    for function_id in function_ids:
+        generateFewShotPrompt(function_id, num_examples=num_examples)
+
+    print("Finished creating few-shot prompts for all functions.")
+
+
+
 # main function to test the prompt generation
 if __name__ == "__main__":
-    generateAllPrompts()
+    #generateAllPrompts()
+    generateNaivePrompt(210)

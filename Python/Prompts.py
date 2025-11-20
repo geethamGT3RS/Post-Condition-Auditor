@@ -81,6 +81,9 @@ def storeFunctionPrompt(function_id, prompt_text, prompt_strategy):
     if existing_prompt:
         return existing_prompt["Prompt_ID"]
 
+    #get the file_path from the function document
+    file_path = single_document.get("file_path", "")
+
     # get the max prompt ID
     max_prompt = prompts_collection.find_one(sort=[("Prompt_ID", -1)])
     if max_prompt:
@@ -93,8 +96,10 @@ def storeFunctionPrompt(function_id, prompt_text, prompt_strategy):
         "Function_ID": function_id,
         "Prompt_Text": prompt_text,
         "Prompt_Strategy": prompt_strategy,
-        "Post_Conditions": [],  # Initialize as empty list
-        "Pre_Conditions": [],  # Initialize as empty list
+        "file_path": file_path,
+        "raw_reasoning": "",
+        "test_cases": [],  # Initialize as empty list
+        #"Pre_Conditions": [],  # Initialize as empty list
         "Correctness_Score": 0.0,  # Initialize as 0.0
         "Mutation_Score": 0.0,  # Initialize as 0.0
         "Hallucination_Score": 0.0,  # Initialize as 0.0
@@ -326,6 +331,7 @@ def updateHallucinationScore(prompt_id, hallucination_score):
     print("Connection to MongoDB closed.")
     return True
 
+#<---Old update function that is no longer used--->#
 def updatePostConditions(prompt_id, post_conditions):
     """function will update the post conditions list of the prompt document in the FunctionPrompts collection based on the Prompt_ID provided in the argument
     Args:
@@ -387,4 +393,212 @@ def updatePostConditions(prompt_id, post_conditions):
     #close the connection
     client.close()
     print("Connection to MongoDB closed.")
+    return True
+
+# Function to update the prompt text for a given Prompt_ID
+def updatePromptText(prompt_id, new_prompt_text) -> None:
+    """Updates the prompt text for a given Prompt_ID in the FunctionPrompts collection.
+    Args:
+        prompt_id (int): The ID of the prompt to be updated.
+        new_prompt_text (str): The new prompt text to be assigned.
+    Returns:
+        None
+    Example usage:
+        updatePromptText(1, "This is the updated prompt text.")
+    """
+    # Validate input types
+    if not isinstance(prompt_id, int):
+        raise TypeError("Prompt ID must be an integer")
+    if not isinstance(new_prompt_text, str):
+        raise TypeError("New prompt text must be a string")
+
+    # 1. Establish a connection to the MongoDB server
+    client, db = get_db_client()
+    db_name = db.name
+    prompts_collection = db["FunctionPrompts"]
+
+    # Test the connection and data retrieval
+    assert client is not None, "Failed to connect to MongoDB"
+    assert db is not None, f"Failed to access database: {db_name}"
+    assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
+
+    #print("Connected to MongoDB!")
+
+    # Update the prompt text for the specified Prompt_ID
+    result = prompts_collection.update_one(
+        {"Prompt_ID": prompt_id},
+        {"$set": {"Prompt_Text": new_prompt_text}}
+    )
+
+    # Check if the document was found and updated
+    if result.matched_count == 0:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+    
+    if result.modified_count == 0:
+        print(f"Prompt text for Prompt ID {prompt_id} is already up to date (no change needed).")
+    else:
+        print(f"Updated prompt text for Prompt ID {prompt_id}.")
+
+    # Close the connection
+    client.close()
+    #print("Connection to MongoDB closed.")
+    return True
+
+def updateTestcases(prompt_id, test_cases : list):
+    """function will update the post conditions list of the prompt document in the FunctionPrompts collection based on the Prompt_ID provided in the argument
+    Args:
+        prompt_id (int): The ID of the prompt to be updated.
+        test_cases (list): The new list of test cases to be assigned.
+    Returns:
+        true if update is successful else raises error
+    Example usage
+    updateTestcases(1, [{"test_case_1": "value1"}, {"test_case_2": "value2"}]) or updateTestcases(1, [])
+    """
+    #Validate the post_conditions and prompt_ID data types
+    if not isinstance(prompt_id, int):
+        raise TypeError("Prompt ID must be an integer")
+    if not isinstance(test_cases, list):
+        raise TypeError("Test cases must be a list")
+    # Validate the test_cases dictionary elements :
+    #Dictionary should have 1 or more items
+    #print("Test cases type:", type(test_cases))
+    #print("Test cases content:", test_cases)
+    if len(test_cases) == 0:
+        raise ValueError("Test cases list cannot be empty")
+    #Each test case in the list should have a test_case_name, preconditions and postconditions keys
+
+    for value in test_cases:
+        if not (isinstance(value, dict) and 
+                "test_case_name" in value and 
+                "preconditions" in value and
+                "postconditions" in value):
+            raise ValueError("Each test_case item must be a dictionary with 'test_case_name', 'preconditions' and 'postconditions' keys")
+    #each postcondition in the dictionary should have minimum 1 "description" and "assert_statement" keys
+        postconditions = value.get("postconditions", [])
+        # print("Postconditions type:", type(postconditions))
+
+        if not isinstance(postconditions, list) or len(postconditions) == 0:
+            raise ValueError("Postconditions must be a non-empty list for test case {}".format(value.get("test_case_name", "")))
+        for postcondition in postconditions:
+            if not (isinstance(postcondition, dict) and 
+                    "description" in postcondition and 
+                    "assert_statement" in postcondition):
+                raise ValueError("Each postcondition must be a dictionary with 'description' and 'assert_statement' keys")
+    #each precondition in the dictionary should have minimum 1 "setup_statement" key and there should be atleast 1 precondition for each test case
+        preconditions = value.get("preconditions", [])
+        #print("Preconditions type:", type(preconditions))
+        if not isinstance(preconditions, dict) or len(preconditions) == 0:
+            raise ValueError("Preconditions must be a non-empty list for test case {}".format(value.get("test_case_name", "")))
+        # for precondition in preconditions:
+        #     print("Precondition type:", type(precondition))
+        #     if not (isinstance(precondition, list) and 
+        #             "setup_statement" in precondition):
+        #         raise ValueError("Each precondition must be a list with 'setup_statement' key")    
+
+    # 1. Establish a connection to the MongoDB server
+    client, db = get_db_client()
+    db_name = db.name
+    # create the prompts collection if it doesn't exist
+    prompts_collection = db["FunctionPrompts"]
+
+    # Test the connection and data retrieval
+    assert client is not None, "Failed to connect to MongoDB"
+    assert db is not None, f"Failed to access database: {db_name}"
+    assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
+
+    # print("Connected to MongoDB!")
+
+    # First check if the document exists
+    existing_doc = prompts_collection.find_one({"Prompt_ID": prompt_id})
+    if not existing_doc:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+
+    # Update the post conditions list of the prompt document
+    result = prompts_collection.update_one(
+        {"Prompt_ID": prompt_id},
+        {"$set": {"test_cases": test_cases}}
+    )
+    
+    # Only raise error if document wasn't found
+    if result.matched_count == 0:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+    
+    if result.modified_count == 0:
+        print(f"Test cases for prompt ID {prompt_id} are already the same (no change needed).")
+    else:
+        print(f"Updated test cases for prompt ID {prompt_id}.")
+    
+    #close the connection
+    client.close()
+    # print("Connection to MongoDB closed.")
+    return True
+
+def updateReasoning(prompt_id, reasoning):
+    """function will update the raw reasoning text of the prompt document in the FunctionPrompts collection based on the Prompt_ID provided in the argument
+    Args:
+        prompt_id (int): The ID of the prompt to be updated.
+        reasoning : The new raw reasoning text to be assigned.
+    Returns:
+        true if update is successful else raises error
+    Example usage
+    updateReasoning(1, "This is the updated reasoning text.")
+    """
+    #Validate the reasoning and prompt_ID data types
+    if not isinstance(prompt_id, int):
+        raise TypeError("Prompt ID must be an integer")
+    # print("Reasoning type:", type(reasoning))
+    # if not isinstance(reasoning, str):
+    #     raise TypeError("Reasoning must be a string")
+    
+
+    # 1. Establish a connection to the MongoDB server
+    client, db = get_db_client()
+    db_name = db.name
+    # create the prompts collection if it doesn't exist
+    prompts_collection = db["FunctionPrompts"]
+
+    # Test the connection and data retrieval
+    assert client is not None, "Failed to connect to MongoDB"
+    assert db is not None, f"Failed to access database: {db_name}"
+    assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
+
+    # print("Connected to MongoDB!")
+
+    # First check if the document exists
+    existing_doc = prompts_collection.find_one({"Prompt_ID": prompt_id})
+    if not existing_doc:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+
+    raw_text = reasoning.text if hasattr(reasoning, 'text') else str(reasoning)
+    full_metadata = type(reasoning).to_dict(reasoning) if hasattr(type(reasoning), 'to_dict') else {}
+    # print("Full metadata:", full_metadata)
+    # Update the raw reasoning text and the LLM metadata of the prompt document
+    result = prompts_collection.update_one(
+        {"Prompt_ID": prompt_id},
+        
+        {"$set": {"raw_reasoning": raw_text, 
+                  "llm_metadata": full_metadata}
+                  }
+
+        #{"$set": {"raw_reasoning": reasoning}}
+
+    )
+    
+    # Only raise error if document wasn't found
+    if result.matched_count == 0:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+    
+    if result.modified_count == 0:
+        print(f"Reasoning for prompt ID {prompt_id} is already the same (no change needed).")
+    else:
+        print(f"Updated reasoning for prompt ID {prompt_id}.")
+    
+    #close the connection
+    client.close()
+    # print("Connection to MongoDB closed.")
     return True

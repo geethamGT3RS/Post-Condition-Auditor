@@ -5,7 +5,7 @@ import httpx
 import re
 import os
 import ast  # <-- ADDED for parsing function name
-from pymongo import MongoClient
+import Prompts
 
 # Import from your existing project structure
 import Prompts
@@ -14,7 +14,7 @@ from config import get_db_client
 # --- Gemini API Configuration ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
 if not API_KEY:
-    API_KEY = "AIzaSyCnZ4LOJQ0aezDIfBNdYvHinWgBSyYw6oo" 
+    API_KEY = "AIzaSyBgSkpBxN9snTdvVHLU0hjjpsXwZBoKf74" 
     if not API_KEY:
         raise ValueError("GEMINI_API_KEY environment variable not set. Please set it before running the script.")
 
@@ -23,32 +23,97 @@ API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-f
 
 # --- JSON Schema ---
 JSON_SCHEMA = {
-    "type": "OBJECT",
-    "properties": {
-        "preconditions": {
-            "type": "ARRAY",
-            "items": {
-                "type": "OBJECT",
-                "properties": {
-                    "setup_statement": {"type": "STRING"}
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Function Test Case Schema",
+  "type": "object",
+  "properties": {
+    "test_cases": {
+      "type": "array",
+      "description": "A list of individual test scenarios for the function.",
+      "items": {
+        "type": "object",
+        "required": [
+          "test_case_name",
+          "preconditions",
+          "postconditions"
+        ],
+        "properties": {
+          "test_case_name": {
+            "type": "string",
+            "description": "A descriptive name for the test case."
+          },
+          "preconditions": {
+            "type": "object",
+            "description": "The setup and function call required before testing postconditions.",
+            "required": ["setup_statement"],
+            "properties": {
+              "setup_statement": {
+                "type": "array",
+                "description": "An ordered list of Python statements to set up inputs and call the function.",
+                "items": {
+                  "type": "string"
                 },
-                "required": ["setup_statement"]
+                "minItems": 1
+              }
             }
-        },
-        "postconditions": {
-            "type": "ARRAY",
+          },
+          "postconditions": {
+            "type": "array",
+            "description": "A list of conditions and assertions that must be true after the function executes.",
             "items": {
-                "type": "OBJECT",
-                "properties": {
-                    "description": {"type": "STRING"},
-                    "assert_statement": {"type": "STRING"}
+              "type": "object",
+              "required": [
+                "description",
+                "assert_statement"
+              ],
+              "properties": {
+                "description": {
+                  "type": "string",
+                  "description": "A human-readable description of the expected result."
                 },
-                "required": ["description", "assert_statement"]
-            }
+                "assert_statement": {
+                  "type": "string",
+                  "description": "The verifiable Python assertion statement (e.g., 'assert result == 20')."
+                }
+              }
+            },
+            "minItems": 1
+          }
         }
-    },
-    "required": ["preconditions", "postconditions"]
+      }
+    }
+  },
+  "required": ["test_cases"]
 }
+#Old JSON Schema
+# JSON_SCHEMA = {
+#     "type": "OBJECT",
+#     "properties": {
+#         "preconditions": {
+#             "type": "ARRAY",
+#             "items": {
+#                 "type": "OBJECT",
+#                 "properties": {
+#                     "setup_statement": {"type": "STRING"}
+#                 },
+#                 "required": ["setup_statement"]
+#             }
+#         },
+#         "postconditions": {
+#             "type": "ARRAY",
+#             "items": {
+#                 "type": "OBJECT",
+#                 "properties": {
+#                     "description": {"type": "STRING"},
+#                     "assert_statement": {"type": "STRING"}
+#                 },
+#                 "required": ["description", "assert_statement"]
+#             }
+#         }
+#     },
+#     "required": ["preconditions", "postconditions"]
+# }
+
 
 # ---!!! ADDED HELPER FUNCTION !!!---
 def get_function_name(code_str: str) -> str | None:
@@ -66,15 +131,16 @@ def get_function_name(code_str: str) -> str | None:
     return None
 
 # ---!!! THIS FUNCTION IS UPDATED !!!---
-async def call_gemini_api(prompt_text: str, strategy: str, func_name: str) -> str | None:
+async def call_gemini_api(prompt_text: str, func_name: str) -> str | None:
     """
     Calls the Gemini API with the given prompt and handles retries.
     Requests a JSON response based on the defined schema.
     
     Args:
         prompt_text: The user's original prompt.
-        strategy: The prompt strategy.
         func_name: The *actual* function name from the database.
+    Returns:
+        The raw text response from the API, or None if the call failed.
     """
     headers = {'Content-Type': 'application/json'}
     
@@ -89,9 +155,9 @@ async def call_gemini_api(prompt_text: str, strategy: str, func_name: str) -> st
     # ---!!! THIS IS THE NEW FIX !!!---
     # We now explicitly tell the LLM the *correct* function name.
     detailed_json_instruction = (
-        f"{prompt_text}\n\n"
+        f"The output is ----<add the output from first call>--- \n\n"
         f"IMPORTANT: The function you are generating test cases for is named: {func_name}\n"
-        "Please provide your response ONLY as a valid JSON object matching the schema.\n\n"
+        "Please convert the output to JSON object matching the schema.\n\n"
         "1. The 'preconditions' array must contain N+1 'setup_statement's for each test case.\n"
         "   - The first N statements set up input parameters (e.g., 'list_a = [1, 2]').\n"
         f"  - The *last* (N+1) statement MUST be the function call *using the name {func_name}*, assigning its output to a variable (e.g., 'result = {func_name}(list_a)').\n"
@@ -105,10 +171,24 @@ async def call_gemini_api(prompt_text: str, strategy: str, func_name: str) -> st
         '"postconditions": ['
         '  {"description": "The sum should be 30", "assert_statement": "assert sum_result == 30"}'
         ']}'
+        'Expected JSON schema is: ' + json.dumps(JSON_SCHEMA, indent=2) + '\n\n'
     )
+
+    # detailed_json_instruction = (
+    #     f"{prompt_text}\n\n"
+    #     f"IMPORTANT: The function you are generating test cases for is named: {func_name}\n"
+    #     "Please provide your response ONLY as a valid JSON object matching the schema.\n\n"
+    #     "1. The 'preconditions' array must contain N+1 'setup_statement's for each test case.\n"
+    #     "   - The first N statements set up input parameters \n"
+    #     f"  - The *last* (N+1) statement MUST be the function call *using the name {func_name}*, assigning its output to a variable.\n"
+    #     "2. The 'postconditions' array must contain the 'assert_statement' that *uses* the 'result' variable.\n\n"
+    # )
+
     
-    # Set the modified prompt text
-    payload["contents"][0]["parts"][0]["text"] = detailed_json_instruction
+    # # Set the modified prompt text
+    # payload["contents"][0]["parts"][0]["text"] = detailed_json_instruction
+    # payload should be the prompt text
+    payload["contents"][0]["parts"][0]["text"] = prompt_text
     # --- END OF MODIFICATION ---
 
 
@@ -124,10 +204,16 @@ async def call_gemini_api(prompt_text: str, strategy: str, func_name: str) -> st
                 
                 if "candidates" in result_json and len(result_json["candidates"]) > 0:
                     text_content = result_json["candidates"][0]["content"]["parts"][0]["text"]
+                    # print the text content for debugging
+                    #print(f"API call successful for prompt: {prompt_text}... Response: {text_content}...")
+                    #return text_content, detailed_json_instruction
+                    #Make the next LLM call with detailed_json_instruction
                     return text_content
                 else:
                     print(f"API call successful but no candidates found for prompt: {prompt_text[:50]}...")
                     return None
+                
+
 
             except httpx.HTTPStatusError as e:
                 print(f"HTTP Error {e.response.status_code} for prompt: {prompt_text[:50]}... Response: {e.response.text}")
@@ -267,7 +353,9 @@ async def process_prompts():
         # ---!!! END OF ADDED LOGIC !!!---
 
         # Pass the correct func_name to the API
-        response_text = await call_gemini_api(prompt_text, prompt_strategy, func_name)
+        detailed_json_instruction = prompt_text
+        response_text = ""
+        response_text = await call_gemini_api(prompt_text=prompt_text, func_name=func_name)
 
         if not response_text:
             print(f"Skipping Prompt ID {prompt_id} due to API failure.")
@@ -287,6 +375,7 @@ async def process_prompts():
                     {"Prompt_ID": prompt_id},
                     {
                         "$set": {
+                            "Prompt_Text": detailed_json_instruction,
                             "Pre_Conditions": pre_conditions_list,
                             "Post_Conditions": post_conditions_list
                         }

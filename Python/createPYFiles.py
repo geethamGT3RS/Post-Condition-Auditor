@@ -92,8 +92,10 @@ class PythonFileCreator:
         if not isinstance(file_path, str):
             file_path = str(file_path)
 
-        # convert the absolute file_path to relative path from base_path
-        file_path = os.path.relpath(file_path, self.base_path)
+        # convert the absolute file_path to relative path from current working directory
+        file_path = os.path.relpath(file_path, os.getcwd())
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Relative file path to store in DB: {file_path}")
 
         #Create MongoDB query to update the file_path for the given function_id
         query = {"Function_ID": function_id}
@@ -179,7 +181,7 @@ class PythonFileCreator:
                 code = code + "\n" + Function_Code
 
             # Create the Python file
-            print(f"Creating Python file for function ID {function['Function_ID']}")
+            #print(f"Creating Python file for function ID {function['Function_ID']}")
 
             ## Catch the exception if the update fails and set success to False
             try:
@@ -191,7 +193,7 @@ class PythonFileCreator:
                     print(f"File path: {file_path}")
                 # Update the file path in the database
                 update_success = self.update_file_path_in_db(function['Function_ID'], file_path)
-                print(f"Update success: {update_success}")
+                #print(f"Update success: {update_success}")
                 # If update fails, set success to False
 
                 if not update_success:

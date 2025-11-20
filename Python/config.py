@@ -1,5 +1,8 @@
+from logging import config
 import os
 
+from anyio import Path
+from dotenv import load_dotenv
 from pymongo import MongoClient
 
 # Load the value from the operating system's environment variables
@@ -24,8 +27,23 @@ def initialize_db_client():
     #client = MongoClient(DATABASE_URL)
     # 1. Establish a connection to the MongoDB server
     # Replace the connection string with your actual URI (e.g., 'mongodb://localhost:27017/')
-    Mongo_URI = DATABASE_URL
-     # Extract the database name from the URL path, or use the default
+    #read from environment variable
+    global Mongo_URI, db_name, client, db
+    # Access the Mongo_URI from the .env file or environment variable
+    #read from config module if exists
+    # define the path of the .env file -> it is in the root directory
+    dotenv_path = Path(__file__).parent.parent / '.env'
+    load_dotenv(dotenv_path)
+      #read from .env file if exists
+    if 'MONGO_URI' in os.environ:
+        Mongo_URI = os.getenv('MONGO_URI')
+    #read from config module if exists
+    elif hasattr(config, 'mongo_uri'):
+        Mongo_URI = config.mongo_uri
+    else:
+        Mongo_URI = DATABASE_URL
+  
+    # Extract the database name from the URL path, or use the default
     try:
         db_name_from_url = Mongo_URI.split('/')[-1].split('?')[0]
         if not db_name_from_url:
@@ -56,3 +74,12 @@ def get_db_client():
     else:
         establish_db_client()
     return client, db
+
+#main function for testing
+if __name__ == "__main__":
+    initialize_db_client()
+    print("Connected to MongoDB!")
+
+    print(f"Database URL: {Mongo_URI}")
+    #close the client
+    client.close()

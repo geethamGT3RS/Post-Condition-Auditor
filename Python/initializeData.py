@@ -1,10 +1,11 @@
 # This script connects to a MongoDB database, retrieves documents from a specified collection,
 # and transforms the dataset into a new collection named "Functions" with a specific structure.
 
+import asyncio
 import os
 import json
 from config import get_db_client
-from pymongo import MongoClient
+import createPYFiles
 from pymongo.errors import ConnectionFailure
 
 def initializeFunctionsCollection():
@@ -75,7 +76,12 @@ def initializeFunctionsCollection():
     # Close the connection when done
     client.close()
     print("Connection to MongoDB closed.")  
-    # Note: The connection is closed here for demonstration purposes. In a real application, you might want to keep it open for further operations.
+    #create the python files from the Functions collection
+    processor = createPYFiles.PythonFileCreator(
+        base_path=os.path.join(os.getcwd(), "py_files")
+    )
+    processor.process_functions()
+    print("Python files created from Functions collection.")
     return True
 
 def initializeMBPPCollection(collection_name):
@@ -140,4 +146,92 @@ def initializeMBPPCollection(collection_name):
 
 # main function to run the initialization
 if __name__ == "__main__":
-    initializeFunctionsCollection() 
+    
+    #Check with user before proceeding
+    proceed = input("This will initialize the Functions collection from the MBPP dataset. Do you want to proceed? (y/n): ")
+    if proceed.lower() == 'y':
+        print("Initializing Functions collection...")
+        # Call the function to initialize the Functions collection
+        initializeFunctionsCollection()
+        print("Functions collection initialized successfully.")
+        #Create the function prompts from generateprompts.py
+        from generatePrompts import generateAllPrompts
+        # from generatePrompts import generateFewShotPrompts
+        generateAllPrompts()
+        # Generate the postconditions using llm_calls_new.py
+        from llm_calls_new import generate_postconditions_for_all_prompts, generate_test_cases_for_all_prompts
+        generate_postconditions_for_all_prompts()
+
+        #check if all the prompts have reasoning generated
+        client, db = get_db_client()
+        prompts_collection = db["FunctionPrompts"]
+        total_prompts = prompts_collection.count_documents({})
+        print(f"Total number of prompts: {total_prompts}")
+        #get the number of prompts without reasoning or reasoning as empty string
+        prompts_without_reasoning = prompts_collection.count_documents({"$or": [{"raw_reasoning": {"$exists": False}}, {"raw_reasoning": ""}]})
+        print(f"Number of prompts without reasoning: {prompts_without_reasoning}")
+        client.close()
+        #if the prompts without reasoning is 0, check if all prompts have test cases generated i.e. test_cases field exists and is non-empty
+        if prompts_without_reasoning == 0:
+            client, db = get_db_client()
+            prompts_collection = db["FunctionPrompts"]
+            prompts_without_test_cases = prompts_collection.count_documents({"$or": [{"test_cases": {"$exists": False}}, {"test_cases": []}]})
+            print(f"Number of prompts without test cases: {prompts_without_test_cases}")
+            client.close()
+            if prompts_without_test_cases == 0:
+                print("All prompts have reasoning and test cases generated.")
+            else:
+                print("Some prompts are missing test cases. Generating test cases...")
+                from llm_calls_new import generate_test_cases_for_all_prompts
+                generate_test_cases_for_all_prompts()
+                print("Test cases generated for all prompts.")
+        else:
+            print("Some prompts are missing reasoning. Re-generate the reasoning first.")
+            #stop the execution here
+            exit(1)
+        print("Post-conditions generated for all prompts.")
+    elif proceed.lower() == 'n':
+        print("Do you want to generate postconditions for existing prompts? (y/n): ")
+        gen_post = input()
+        if gen_post.lower() == 'y':
+            print("Generating postconditions for existing prompts...")
+            from llm_calls_new import generate_postconditions_for_all_prompts, generate_test_cases_for_all_prompts
+            try:
+                #if prompts do not have reasoning, generate reasoning first
+                client, db = get_db_client()
+                prompts_collection = db["FunctionPrompts"]
+                prompts_without_reasoning = prompts_collection.count_documents({"$or": [{"raw_reasoning": {"$exists": False}}, {"raw_reasoning": ""}]})
+                client.close()
+                if prompts_without_reasoning > 0:
+                    print("Some prompts are missing reasoning. Generating reasoning first...")
+                    generate_postconditions_for_all_prompts()
+                    print("Reasoning generated for all prompts.")
+                print("Generating test cases for existing prompts...")
+                #run generate_test_cases_for_all_prompts if prompts do not have test cases
+                client, db = get_db_client()
+                prompts_collection = db["FunctionPrompts"]
+                prompts_without_test_cases = prompts_collection.count_documents({"$or": [{"test_cases": {"$exists": False}}, {"test_cases": []}]})
+                client.close()
+                if prompts_without_test_cases > 0:
+                    print("Some prompts are missing test cases. Generating test cases...")
+                    generate_test_cases_for_all_prompts()
+            except Exception as e:
+                print(f"Error generating postconditions or test cases: {e}")
+                exit(1)
+            
+            print("Post-conditions generated for all prompts.")
+        elif gen_post.lower() == 'n':
+            print("Exiting...")
+            exit(0)
+    #Generate the postconditions using llm_integration.py
+    # from llm_integration import process_prompts
+    # try:
+    #     asyncio.run(process_prompts())
+    # except RuntimeError:
+    #     # Handle already-running asyncio loop (e.g., in Jupyter)
+    #     print("Asyncio already running. Awaiting main().")
+    #     loop = asyncio.get_event_loop()
+    #     loop.create_task(asyncio.run(process_prompts()))
+
+
+    #generate FewShotPrompts() for the functions
