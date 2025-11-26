@@ -242,12 +242,12 @@ def generateChainOfThoughtPrompt(function_id):
     2. **Trace Logic/Side Effects:** Describe the main calculation, control flow (if/else), and any external changes (side effects). 
     3. **Formulate Postconditions:** Draft the high-level facts about the return value and program state following the below logic rules.
     **LOGIC RULES FOR FORMULATING POSTCONDITIONS:**
-    - **GOLDEN RULE OF PBT**: Do not use 'assumptions' to filter for low-probability events (like specific substrings 'password' or random list overlaps). If you cannot guarantee a condition using `input_constraints` (ranges/patterns), **DO NOT TEST IT**. Rely on the test engine to find edge cases naturally.
     - For numeric returns, consider ranges, sign (positive/negative), and special values (zero).
     - For collections (lists, dicts), consider length, emptiness, and content properties.
     - For boolean returns, consider both True and False outcomes.
     - For functions with side effects, include conditions on modified global state or external systems.
     - Ensure postconditions are testable via assert statements.
+    - **GOLDEN RULE OF PBT**: Do not use 'assumptions' to filter for low-probability events (like specific substrings 'password' or random list overlaps). If you cannot guarantee a condition using `input_constraints` (ranges/patterns), **DO NOT TEST IT**. Rely on the test engine to find edge cases naturally.
     **Provided Information:**
         **Python Function:** {function_code}
         **Function Description: ** {function_description}
