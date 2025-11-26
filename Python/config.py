@@ -78,7 +78,7 @@ def get_db_client():
 #main function for testing
 if __name__ == "__main__":
     initialize_db_client()
-    print("Connected to MongoDB!")
+    # print("Connected to MongoDB!")
 
     print(f"Database URL: {Mongo_URI}")
     #close the client

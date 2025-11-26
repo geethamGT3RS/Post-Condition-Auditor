@@ -24,7 +24,7 @@ def generateNaivePrompt(function_id):
     assert db is not None, f"Failed to access database: {db_name}"
     assert functions_collection is not None, f"Failed to access collection: {functions_collection}"
 
-    print("Connected to MongoDB!")
+    # print("Connected to MongoDB!")
 
     # Fetch the function document from the Functions collection
     function_document = functions_collection.find_one({"Function_ID": function_id})
@@ -38,15 +38,21 @@ def generateNaivePrompt(function_id):
 
     #close the connection
     client.close()
-    print("Connection to MongoDB closed for generateNaivePrompt.")
+    # print("Connection to MongoDB closed for generateNaivePrompt.")
      
 
     # Generate a simple prompt using the function description. Start the prompt with "provide the assert statements of the postconditions (in JSON format with the description and assert statement only) for a function to"
     # then append the function description's text after "function to" string. 
     function_description = function_description.replace("Write a function to", " ")
     function_description = function_description.replace("Write a python function to", " ")
+    #remove the full stop at the end if exists
+    if function_description.endswith("."):
+        function_description = function_description[:-1]
     #print(f"Function Description for Prompt Generation: {function_description}")
-    prompt_text = f"provide the preconditions and postconditions  for a function to {function_description} to test this function holistically."
+    prompt_text = f"""Provide the set of preconditions and postconditions for **Property-Based Testing (PBT)** using the Hypothesis library for a function to {function_description} to test this function fully using a set of diverse test strategies like boundary testing, edge case testing, invariant testing, and typical case testing.
+    **GOLDEN RULE OF PBT**: Do not use 'assumptions' to filter for low-probability events (like specific substrings 'password' or random list overlaps). If you cannot guarantee a condition using `input_constraints` (ranges/patterns), **DO NOT TEST IT**. Rely on the test engine to find edge cases naturally.
+    Minimize whitespace. 
+    Do not include long explanations. Ensure JSON is complete"""
     print(f"Generated Prompt: {prompt_text}")
     # Store the generated prompt in the Prompts collection
     prompt_id = Prompts.storeFunctionPrompt(function_id=function_id, prompt_text=prompt_text, prompt_strategy="Naive_strategy")
@@ -79,7 +85,7 @@ def generateFewShotPrompt(function_id, num_examples=3):
     assert Prompts_collection is not None, f"Failed to access collection: {Prompts_collection}"
     assert Functions_collection is not None, f"Failed to access collection: {Functions_collection}"
 
-    print("Connected to MongoDB!")
+    # print("Connected to MongoDB!")
 
     # Check if FewShot strategy prompt already exists for the function ID in the Prompts collection
     existing_prompt = Prompts_collection.find_one({"Function_ID": function_id, "Prompt_Strategy": "FewShot_strategy"})
@@ -148,11 +154,13 @@ def generateFewShotPrompt(function_id, num_examples=3):
 
     #close the connection
     client.close()
-    print("Connection to MongoDB closed for generateFewShotPrompt.")
+    # print("Connection to MongoDB closed for generateFewShotPrompt.")
      
     # Start the prompt with "provide the assert statements of the postconditions (in JSON format with the description and assert statement only) for a function to"
     # then append the function description's text after "function to" string. 
-    prompt_text = f"provide the the preconditions and postconditions for a function to perform the following task to test the function holistically:\n{function_description}\n\n"
+    prompt_text = f"""provide the the preconditions and postconditions for**Property-Based Testing (PBT)** using the Hypothesis library for a function to perform the following task to test the function holistically using diverse testing strategies:\n{function_description}\n\n
+                    **GOLDEN RULE OF PBT**: Do not use 'assumptions' to filter for low-probability events (like specific substrings 'password' or random list overlaps). If you cannot guarantee a condition using `input_constraints` (ranges/patterns), **DO NOT TEST IT**. Rely on the test engine to find edge cases naturally.
+    """
     
     prompt_text += "Here are some examples of the postcondition analysis are:\n"
     
@@ -172,7 +180,6 @@ def generateFewShotPrompt(function_id, num_examples=3):
     # Store the generated prompt in the Prompts collection
     prompt_id = Prompts.storeFunctionPrompt(function_id=function_id, prompt_text=prompt_text, prompt_strategy="FewShot_strategy")
     print(f"Stored Few-Shot Prompt ID: {prompt_id} for function ID {function_id}")
-
     return prompt_text
 
 
@@ -197,7 +204,7 @@ def generateChainOfThoughtPrompt(function_id):
     assert db is not None, f"Failed to access database: {db_name}"
     assert functions_collection is not None, f"Failed to access collection: {functions_collection}"
 
-    print("Connected to MongoDB!")
+    # print("Connected to MongoDB!")
 
     # Fetch the function document from the Functions collection
     function_document = functions_collection.find_one({"Function_ID": function_id})
@@ -215,19 +222,37 @@ def generateChainOfThoughtPrompt(function_id):
 
     #close the connection
     client.close()  
-    print("Connection to MongoDB closed for generateChainOfThoughtPrompt.")
+    # print("Connection to MongoDB closed for generateChainOfThoughtPrompt.")
     
-    prompt_text = f"""You are an expert software engineer tasked with generating verifiable postconditions for a given Python function to test is holistically. 
+    prompt_text = f"""
+    **Role**: You are an expert QA engineer tasked with generating verifiable postconditions for **Property-Based Testing (PBT)** using the Hypothesis library for a 
+    given Python function to test it holistically using diverse testing strategies including boundary testing, edge case testing, invariant testing, and typical case testing.
+    **Objective:**
+        Analyze the provided Python function and generate a comprehensive JSON test suite covering:
+        1. Basic Functionality (Happy Path)
+        2. Edge Cases (Empty inputs, Zeros, None)
+        3. Boundary Values (Min/Max integers, Large lists)
+        4. Invariants (Properties that always hold true)
     **Task:**
-    1. **Analyze** the provided function code and its docstring. 
-    2. **Apply Chain-of-Thought (CoT):** First , generate the intermediate analysis (Steps 1, 2, and 3 below). 
-    3. **Final Output:** Output ONLY a JSON object containing the `postconditions` list. Do NOT include the CoT steps in the final output. 
+        1. **Analyze** the provided function code and its docstring. 
+        2. **Apply Chain-of-Thought (CoT):** First , generate the intermediate analysis (Steps 1, 2, and 3 below). 
+        3. **Final Output:** Output ONLY a JSON object containing the `postconditions` list. Do NOT include the CoT steps in the final output. 
     **CoT Steps (for internal reasoning only):** 
     ** 1. **Analyze Inputs/Preconditions:** Identify parameter types and necessary input conditions. 
     2. **Trace Logic/Side Effects:** Describe the main calculation, control flow (if/else), and any external changes (side effects). 
-    3. **Formulate Postconditions:** Draft the high-level facts about the return value and program state. 
-    **Python Function:** {function_code}
-    **Function Description: ** {function_description}"""
+    3. **Formulate Postconditions:** Draft the high-level facts about the return value and program state following the below logic rules.
+    **LOGIC RULES FOR FORMULATING POSTCONDITIONS:**
+    - **GOLDEN RULE OF PBT**: Do not use 'assumptions' to filter for low-probability events (like specific substrings 'password' or random list overlaps). If you cannot guarantee a condition using `input_constraints` (ranges/patterns), **DO NOT TEST IT**. Rely on the test engine to find edge cases naturally.
+    - For numeric returns, consider ranges, sign (positive/negative), and special values (zero).
+    - For collections (lists, dicts), consider length, emptiness, and content properties.
+    - For boolean returns, consider both True and False outcomes.
+    - For functions with side effects, include conditions on modified global state or external systems.
+    - Ensure postconditions are testable via assert statements.
+    **Provided Information:**
+        **Python Function:** {function_code}
+        **Function Description: ** {function_description}
+    **Final Output Requirements:**
+    Minimize whitespace. Do not include long explanations. Ensure the response is complete"""
     #-----Deleted Prompt ---- #
     # **Required JSON Output Format:** 
     # The final output must be a single JSON object with a key `postconditions`. Each element in the list must have two keys: 

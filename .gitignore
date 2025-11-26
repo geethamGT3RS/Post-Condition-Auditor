@@ -1,0 +1,28 @@
+# --- Secrets & Config (Never commit these) ---
+secrets.json
+config.js
+
+# --- Logs & Databases ---
+*.log
+*.sqlite3
+dump.rdb
+# specific error log files
+error_log
+debug.log
+
+# --- Dependencies ---
+# Python
+__pycache__/
+venv/
+.pytest_cache/
+
+# Web / JavaScript
+node_modules/
+dist/
+.DS_Store
+
+---New files -- 
+.hypothesis/
+Documentation/~$oject Desc.docx
+Python/Archive/
+Python/correctnesstesting old.py

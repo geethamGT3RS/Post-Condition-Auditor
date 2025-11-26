@@ -6,3 +6,5 @@ pytest
 hypothesis
 google.generativeai
 tenacity
+jsonschema
+func-timeout

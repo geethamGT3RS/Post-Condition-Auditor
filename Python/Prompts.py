@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from config import get_db_client
+import ast
 
 # Function name: storeFunctionPrompt
 # function will create a prompt for the function ID in the Functions collection. It does that by
@@ -58,7 +59,7 @@ def storeFunctionPrompt(function_id, prompt_text, prompt_strategy):
     assert db is not None, f"Failed to access database: {db_name}"
     assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
     assert functions_collection is not None, f"Failed to access collection: {functions_collection}"
-    print("Connected to MongoDB!")
+    # print("Connected to MongoDB!")
     
     # Fetch the function document from the Functions collection
     single_document = functions_collection.find_one({"Function_ID": function_id})  # Fetch the function document from the Functions collection
@@ -113,7 +114,7 @@ def storeFunctionPrompt(function_id, prompt_text, prompt_strategy):
     )
     #close the connection
     client.close()
-    print("Connection to MongoDB closed.")
+    # print("Connection to MongoDB closed.")
 
     return prompt_document["Prompt_ID"] 
 
@@ -138,17 +139,17 @@ def getPromptbyPromptID(prompt_id):
     assert db is not None, f"Failed to access database: {db_name}"
     assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
    
-    print("Connected to MongoDB!")
+    # print("Connected to MongoDB!")
 
     # Fetch the prompt document from the FunctionPrompts collection
     prompt_document = prompts_collection.find_one({"Prompt_ID": prompt_id})  # Fetch the prompt document from the FunctionPrompts collection
     if not prompt_document: 
         raise ValueError(f"Prompt with ID {prompt_id} not found.")  # Handle case where prompt ID is not found  
     assert prompt_document is not None, f"Failed to find prompt with ID: {prompt_id}"
-    print(prompt_document)  # Print the fetched document to verify the connection and data retrieval
+    # print(prompt_document)  # Print the fetched document to verify the connection and data retrieval
     #close the connection
     client.close()  
-    print("Connection to MongoDB closed.")
+    # print("Connection to MongoDB closed.")
     return prompt_document
 
 def updateCorrectnessScore(prompt_id, correctness_score):
@@ -182,7 +183,7 @@ def updateCorrectnessScore(prompt_id, correctness_score):
     assert db is not None, f"Failed to access database: {db_name}"
     assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
 
-    print("Connected to MongoDB!")
+    # print("Connected to MongoDB!")
 
     # First check if the document exists
     existing_doc = prompts_collection.find_one({"Prompt_ID": prompt_id})
@@ -208,7 +209,7 @@ def updateCorrectnessScore(prompt_id, correctness_score):
     
     #close the connection
     client.close()
-    print("Connection to MongoDB closed.")
+    # print("Connection to MongoDB closed.")
     return True
 
 def updateMutationScore(prompt_id, mutation_score):
@@ -242,7 +243,7 @@ def updateMutationScore(prompt_id, mutation_score):
     assert db is not None, f"Failed to access database: {db_name}"
     assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
 
-    print("Connected to MongoDB!")
+    # print("Connected to MongoDB!")
 
     # First check if the document exists
     existing_doc = prompts_collection.find_one({"Prompt_ID": prompt_id})
@@ -268,7 +269,7 @@ def updateMutationScore(prompt_id, mutation_score):
     
     #close the connection
     client.close()
-    print("Connection to MongoDB closed.")
+    # print("Connection to MongoDB closed.")
     return True
 
 def updateHallucinationScore(prompt_id, hallucination_score):
@@ -302,7 +303,7 @@ def updateHallucinationScore(prompt_id, hallucination_score):
     assert db is not None, f"Failed to access database: {db_name}"
     assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
 
-    print("Connected to MongoDB!")
+    # print("Connected to MongoDB!")
 
     # First check if the document exists
     existing_doc = prompts_collection.find_one({"Prompt_ID": prompt_id})
@@ -328,7 +329,7 @@ def updateHallucinationScore(prompt_id, hallucination_score):
     
     #close the connection
     client.close()
-    print("Connection to MongoDB closed.")
+    # print("Connection to MongoDB closed.")
     return True
 
 #<---Old update function that is no longer used--->#
@@ -366,7 +367,7 @@ def updatePostConditions(prompt_id, post_conditions):
     assert db is not None, f"Failed to access database: {db_name}"
     assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
 
-    print("Connected to MongoDB!")
+    # print("Connected to MongoDB!")
 
     # First check if the document exists
     existing_doc = prompts_collection.find_one({"Prompt_ID": prompt_id})
@@ -392,7 +393,7 @@ def updatePostConditions(prompt_id, post_conditions):
     
     #close the connection
     client.close()
-    print("Connection to MongoDB closed.")
+    # print("Connection to MongoDB closed.")
     return True
 
 # Function to update the prompt text for a given Prompt_ID
@@ -447,6 +448,7 @@ def updatePromptText(prompt_id, new_prompt_text) -> None:
 
 def updateTestcases(prompt_id, test_cases : list):
     """function will update the post conditions list of the prompt document in the FunctionPrompts collection based on the Prompt_ID provided in the argument
+    Also, get the name of the function to be called from the execution statement of the test case and validate if the function name matches the function name in the Function collection for the given prompt ID.
     Args:
         prompt_id (int): The ID of the prompt to be updated.
         test_cases (list): The new list of test cases to be assigned.
@@ -468,33 +470,33 @@ def updateTestcases(prompt_id, test_cases : list):
         raise ValueError("Test cases list cannot be empty")
     #Each test case in the list should have a test_case_name, preconditions and postconditions keys
 
-    for value in test_cases:
-        if not (isinstance(value, dict) and 
-                "test_case_name" in value and 
-                "preconditions" in value and
-                "postconditions" in value):
-            raise ValueError("Each test_case item must be a dictionary with 'test_case_name', 'preconditions' and 'postconditions' keys")
-    #each postcondition in the dictionary should have minimum 1 "description" and "assert_statement" keys
-        postconditions = value.get("postconditions", [])
-        # print("Postconditions type:", type(postconditions))
+    # for value in test_cases:
+    #     if not (isinstance(value, dict) and 
+    #             "test_case_name" in value and 
+    #             "preconditions" in value and
+    #             "postconditions" in value):
+    #         raise ValueError("Each test_case item must be a dictionary with 'test_case_name', 'preconditions' and 'postconditions' keys")
+    # #each postcondition in the dictionary should have minimum 1 "description" and "assert_statement" keys
+    #     postconditions = value.get("postconditions", [])
+    #     # print("Postconditions type:", type(postconditions))
 
-        if not isinstance(postconditions, list) or len(postconditions) == 0:
-            raise ValueError("Postconditions must be a non-empty list for test case {}".format(value.get("test_case_name", "")))
-        for postcondition in postconditions:
-            if not (isinstance(postcondition, dict) and 
-                    "description" in postcondition and 
-                    "assert_statement" in postcondition):
-                raise ValueError("Each postcondition must be a dictionary with 'description' and 'assert_statement' keys")
-    #each precondition in the dictionary should have minimum 1 "setup_statement" key and there should be atleast 1 precondition for each test case
-        preconditions = value.get("preconditions", [])
-        #print("Preconditions type:", type(preconditions))
-        if not isinstance(preconditions, dict) or len(preconditions) == 0:
-            raise ValueError("Preconditions must be a non-empty list for test case {}".format(value.get("test_case_name", "")))
-        # for precondition in preconditions:
-        #     print("Precondition type:", type(precondition))
-        #     if not (isinstance(precondition, list) and 
-        #             "setup_statement" in precondition):
-        #         raise ValueError("Each precondition must be a list with 'setup_statement' key")    
+    #     if not isinstance(postconditions, list) or len(postconditions) == 0:
+    #         raise ValueError("Postconditions must be a non-empty list for test case {}".format(value.get("test_case_name", "")))
+    #     for postcondition in postconditions:
+    #         if not (isinstance(postcondition, dict) and 
+    #                 "description" in postcondition and 
+    #                 "assert_statement" in postcondition):
+    #             raise ValueError("Each postcondition must be a dictionary with 'description' and 'assert_statement' keys")
+    # #each precondition in the dictionary should have minimum 1 "setup_statement" key and there should be atleast 1 precondition for each test case
+    #     preconditions = value.get("preconditions", [])
+    #     #print("Preconditions type:", type(preconditions))
+    #     if not isinstance(preconditions, dict) or len(preconditions) == 0:
+    #         raise ValueError("Preconditions must be a non-empty list for test case {}".format(value.get("test_case_name", "")))
+    #     # for precondition in preconditions:
+    #     #     print("Precondition type:", type(precondition))
+    #     #     if not (isinstance(precondition, list) and 
+    #     #             "setup_statement" in precondition):
+    #     #         raise ValueError("Each precondition must be a list with 'setup_statement' key")    
 
     # 1. Establish a connection to the MongoDB server
     client, db = get_db_client()
@@ -515,6 +517,18 @@ def updateTestcases(prompt_id, test_cases : list):
         client.close()
         raise ValueError(f"Prompt with ID {prompt_id} not found.")
 
+    for case in test_cases:
+        constraints = case.get("input_constraints", {})
+        for arg, rules in constraints.items():
+            if "min_val" in rules and isinstance(rules["min_val"], int):
+                if abs(rules["min_val"]) > 9223372036854775807:
+                    rules["min_val"] = 9223372036854775807 # Cap it
+                    print(f"Capped min_val for argument '{arg}' to 9223372036854775807")
+            if "max_val" in rules and isinstance(rules["max_val"], int):
+                if abs(rules["max_val"]) > 9223372036854775807:
+                    rules["max_val"] = 9223372036854775807 # Cap it
+                    print(f"Capped max_val for argument '{arg}' to 9223372036854775807")
+
     # Update the post conditions list of the prompt document
     result = prompts_collection.update_one(
         {"Prompt_ID": prompt_id},
@@ -534,6 +548,9 @@ def updateTestcases(prompt_id, test_cases : list):
     #close the connection
     client.close()
     # print("Connection to MongoDB closed.")
+
+    # Get
+
     return True
 
 def updateReasoning(prompt_id, reasoning):
@@ -574,14 +591,15 @@ def updateReasoning(prompt_id, reasoning):
         raise ValueError(f"Prompt with ID {prompt_id} not found.")
 
     raw_text = reasoning.text if hasattr(reasoning, 'text') else str(reasoning)
-    full_metadata = type(reasoning).to_dict(reasoning) if hasattr(type(reasoning), 'to_dict') else {}
+    # full_metadata = type(reasoning).to_dict(reasoning) if hasattr(type(reasoning), 'to_dict') else {}   -- Not used currently
     # print("Full metadata:", full_metadata)
     # Update the raw reasoning text and the LLM metadata of the prompt document
     result = prompts_collection.update_one(
         {"Prompt_ID": prompt_id},
         
         {"$set": {"raw_reasoning": raw_text, 
-                  "llm_metadata": full_metadata}
+                #   "reasoning_llm_metadata": full_metadata
+                  }
                   }
 
         #{"$set": {"raw_reasoning": reasoning}}
@@ -602,3 +620,226 @@ def updateReasoning(prompt_id, reasoning):
     client.close()
     # print("Connection to MongoDB closed.")
     return True
+#get function name from code string
+def get_function_name(code_str: str) -> str | None:
+    """
+    Parses a string of Python code and returns the name
+    of the first function defined in it.
+    """
+    try:
+        tree = ast.parse(code_str)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                return node.name
+    except Exception as e:
+        print(f"Error parsing function name from code: {e}")
+    return None
+
+#get the function name from the assert statement in the test case of function code
+def get_function_name_ast(code_str):
+    # Add any standard python functions you want to ignore here
+    ignore_list = {
+        'set', 'list', 'tuple', 'dict', 'sorted', 'len', 
+        'frozenset', 'sum', 'min', 'max', 'any', 'all', 
+        'map', 'filter', 'str', 'int', 'float', 'bool', 'isclose'
+    }
+    
+    try:
+        tree = ast.parse(code_str)
+        
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assert):
+                
+                # Get the test part of the assertion
+                if isinstance(node.test, ast.Compare):
+                    test_structure = node.test.left
+                else:
+                    test_structure = node.test
+
+                # Walk through the expression looking for function calls
+                # Note: ast.walk() yields parent nodes before child nodes
+                for sub_node in ast.walk(test_structure):
+                    if isinstance(sub_node, ast.Call):
+                        
+                        # Extract name
+                        func_name = None
+                        if isinstance(sub_node.func, ast.Name):
+                            func_name = sub_node.func.id
+                        elif isinstance(sub_node.func, ast.Attribute):
+                            # For 'math.isclose', this gets 'isclose'
+                            func_name = sub_node.func.attr 
+                        
+                        # 2. The Fix: 
+                        # If the function is in the ignore list, we do nothing and 
+                        # let the loop continue to the next node (which will be the 
+                        # children/arguments of this call).
+                        # If it is NOT in the ignore list, we return it immediately.
+                        if func_name and func_name not in ignore_list:
+                            return func_name
+
+    except SyntaxError:
+        return "Invalid Syntax"
+    return None
+#Get the fuction code and function name from the prompt_id
+def getFunctionCodeAndNameFromPromptID(prompt_id: int) -> tuple[str | None, str | None]:
+    """
+    Given a prompt ID, retrieves the associated function code and function name
+    from the FunctionPrompts and Functions collections.
+    Args:
+        prompt_id (int): The ID of the prompt.
+    Returns:
+        tuple[str | None, str | None]: A tuple containing the function code and function name. If not found, returns (None, None).
+    """
+    # 1. Establish a connection to the MongoDB server
+    client, db = get_db_client()
+    db_name = db.name
+    # create the prompts collection if it doesn't exist
+    prompts_collection = db["FunctionPrompts"]
+    functions_collection = db["Functions"]
+
+    # Test the connection and data retrieval
+    assert client is not None, "Failed to connect to MongoDB"
+    assert db is not None, f"Failed to access database: {db_name}"
+    assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
+    assert functions_collection is not None, f"Failed to access collection: {functions_collection}"
+
+    # print("Connected to MongoDB!")
+    # Fetch the prompt document from the FunctionPrompts collection
+    prompt_document = prompts_collection.find_one({"Prompt_ID": prompt_id})
+    if not prompt_document:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+    function_id = prompt_document.get("Function_ID")
+    if not function_id:
+        client.close()
+        raise ValueError(f"Function_ID not found in prompt with ID {prompt_id}.")
+    
+    # Fetch the function document from the Functions collection
+    function_document = functions_collection.find_one({"Function_ID": function_id})
+    if not function_document:
+        client.close()
+        raise ValueError(f"Function with ID {function_id} not found.")      
+    function_code = function_document.get("Function_Code")
+    if not function_code:
+        client.close()
+        raise ValueError(f"Function_Code not found in function with ID {function_id}.")
+    # get the first assertstatement from the Function_Test_Cases list in the function document
+    assert_statements = function_document.get("Function_Test_Cases", [])
+    if not assert_statements:
+        function_name = get_function_name(function_code) if function_code else None
+    else:
+        first_test_case = assert_statements[0]
+        # print("First test case:", first_test_case)
+        function_name = get_function_name_ast(first_test_case) if first_test_case else None
+    #close the connection
+    client.close()
+    # print("Connection to MongoDB closed.")
+    return function_name, function_code
+
+# Function to save the formatting prompt for a given prompt ID
+def save_formatting_prompt(prompt_id: int, formatting_prompt: str) -> None:
+    """
+    Saves the formatting prompt for a given prompt ID.
+    Args:
+        prompt_id (int): The ID of the prompt to be updated.
+        formatting_prompt (str): The formatting prompt text to be assigned.
+    Returns:
+        None
+    """
+    # Validate input types
+    if not isinstance(prompt_id, int):
+        raise TypeError("Prompt ID must be an integer")
+    if not isinstance(formatting_prompt, str):
+        raise TypeError("Formatting prompt must be a string")
+
+    # 1. Establish a connection to the MongoDB server
+    client, db = get_db_client()
+    db_name = db.name
+    prompts_collection = db["FunctionPrompts"]
+
+    # Test the connection and data retrieval
+    assert client is not None, "Failed to connect to MongoDB"
+    assert db is not None, f"Failed to access database: {db_name}"
+    assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
+
+    #print("Connected to MongoDB!")
+
+    # Update the formatting prompt for the specified Prompt_ID
+    result = prompts_collection.update_one(
+        {"Prompt_ID": prompt_id},
+        {"$set": {"Formatting_Prompt": formatting_prompt}}
+    )
+
+    # Check if the document was found and updated
+    if result.matched_count == 0:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+    
+    if result.modified_count == 0:
+        print(f"Formatting prompt for Prompt ID {prompt_id} is already up to date (no change needed).")
+    else:
+        print(f"Updated formatting prompt for Prompt ID {prompt_id}.")
+
+    # Close the connection
+    client.close()
+    #print("Connection to MongoDB closed.")
+    return True
+
+def save_structured_response(prompt_id: int, structured_response: str) -> None:
+    """
+    Saves the structured response for a given prompt ID.
+    Args:
+        prompt_id (int): The ID of the prompt to be updated.
+        structured_response (str): The structured response text to be assigned.
+    Returns:
+        None
+    """
+    # Validate input types
+    if not isinstance(prompt_id, int):
+        raise TypeError("Prompt ID must be an integer")
+    if not isinstance(structured_response, str):
+        raise TypeError("Structured response must be a string")
+
+    # 1. Establish a connection to the MongoDB server
+    client, db = get_db_client()
+    db_name = db.name
+    prompts_collection = db["FunctionPrompts"]
+
+    # Test the connection and data retrieval
+    assert client is not None, "Failed to connect to MongoDB"
+    assert db is not None, f"Failed to access database: {db_name}"
+    assert prompts_collection is not None, f"Failed to access collection: {prompts_collection}"
+
+    #print("Connected to MongoDB!")
+
+    # Update the structured response for the specified Prompt_ID
+    result = prompts_collection.update_one(
+        {"Prompt_ID": prompt_id},
+        {"$set": {"Structured_Response": structured_response}}
+    )
+
+    # Check if the document was found and updated
+    if result.matched_count == 0:
+        client.close()
+        raise ValueError(f"Prompt with ID {prompt_id} not found.")
+    
+    if result.modified_count == 0:
+        print(f"Structured response for Prompt ID {prompt_id} is already up to date (no change needed).")
+    else:
+        print(f"Updated structured response for Prompt ID {prompt_id}.")
+
+    # Close the connection
+    client.close()
+    #print("Connection to MongoDB closed.")
+    return True
+
+
+#main function for testing
+if __name__ == "__main__":
+    # testing for getFunctionCodeAndNameFromPromptID
+    try:
+        function_name, function_code = getFunctionCodeAndNameFromPromptID(7)
+        print("Function Name:", function_name)
+        print("Function Code:", function_code)
+    except Exception as e:
+        print("Error:", e)

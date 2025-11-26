@@ -8,6 +8,27 @@ from config import get_db_client
 import createPYFiles
 from pymongo.errors import ConnectionFailure
 
+# Prune problematic functions from the collection
+def prune_problematic_functions():
+    """
+    Prunes problematic functions from the Functions collection based on predefined criteria.
+    Example usage:
+    prune_problematic_functions()
+    """
+    client, db = get_db_client()
+    functions_collection = db["Functions"]
+
+    # Create the list of Function_IDs to be removed
+    problematic_function_ids = [
+        # 28,39,75
+        ]
+
+    # Remove problematic functions
+    for func_id in problematic_function_ids:
+        functions_collection.delete_one({"Function_ID": func_id})
+    print(f"Removed {len(problematic_function_ids)} problematic functions.")
+
+
 def initializeFunctionsCollection():
     """
     Initializes the Functions collection by transforming data from an existing collection.
@@ -43,7 +64,7 @@ def initializeFunctionsCollection():
         print("Server not available")
         return False
     
-    print("Connected to MongoDB!")
+    # print("Connected to MongoDB!")
 
     single_document = mbpp_collection.find_one()  # Fetch a single document from the collection
     
@@ -73,9 +94,10 @@ def initializeFunctionsCollection():
             # Add other fields as necessary
         })
     print(f"Transformed dataset into '{functions_collection_name}' collection with {num_of_records} records.")
+    prune_problematic_functions()
     # Close the connection when done
     client.close()
-    print("Connection to MongoDB closed.")  
+    # print("Connection to MongoDB closed.")  
     #create the python files from the Functions collection
     processor = createPYFiles.PythonFileCreator(
         base_path=os.path.join(os.getcwd(), "py_files")
@@ -123,7 +145,7 @@ def initializeMBPPCollection(collection_name):
         collection_name = "SanitizedMBPPProblemSet"
     collection = db[collection_name]
     assert collection is not None, f"Failed to access collection: {collection_name}"
-    print("Connected to MongoDB! for loading JSON data into collection.")
+    # print("Connected to MongoDB! for loading JSON data into collection.")
 
     collection.drop()  # Drop the collection if it already exists to avoid duplicates
     
@@ -137,16 +159,16 @@ def initializeMBPPCollection(collection_name):
     print(f"Loaded data into '{collection_name}' collection from '{json_file_path}'.")
     print(f"Number of records inserted: {collection.count_documents({})}")
     # Close the connection when done
-    print("Closing connection to MongoDB...")
+    # print("Closing connection to MongoDB...")
     client.close()
-    print("Connection to MongoDB closed.")  
+    # print("Connection to MongoDB closed.")  
     # Note: The connection is closed here for demonstration purposes. In a real application, you might want to keep it open for further operations.
     return collection_name
    
 
 # main function to run the initialization
-if __name__ == "__main__":
-    
+def main():
+ 
     #Check with user before proceeding
     proceed = input("This will initialize the Functions collection from the MBPP dataset. Do you want to proceed? (y/n): ")
     if proceed.lower() == 'y':
@@ -235,3 +257,23 @@ if __name__ == "__main__":
 
 
     #generate FewShotPrompts() for the functions
+if __name__ == "__main__":
+    #check with user before proceeding
+    proceed = input("Do you want to recreate the existing DB?(y/n): ")
+    if proceed.lower() == 'y':
+        #drop the existing DB
+        client, db = get_db_client()
+        client.drop_database(db.name)
+        client.close()
+    else:
+        print("Exiting...")
+        exit(0)
+    #initialize the Functions collection
+    print("Initializing Functions collection...")
+    # Call the function to initialize the Functions collection
+    initializeFunctionsCollection()
+    print("Functions collection initialized successfully.")
+        #Create the function prompts from generateprompts.py
+    from generatePrompts import generateAllPrompts
+        # from generatePrompts import generateFewShotPrompts
+    generateAllPrompts()

@@ -1,0 +1,931 @@
+{
+    "prompt_id": 1,
+    "function_name": "similar_elements",
+    "metric": 26.666666666666668,
+    "details": [
+        {
+            "id": "pc_1",
+            "status": "FAIL",
+            "reason": "Assertion Failed: set(result) == set(test_tup1) & set(test_tup2)"
+        },
+        {
+            "id": "pc_2",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_3",
+            "status": "FAIL",
+            "reason": "Assertion Failed: set(result) == set(test_tup1) & set(test_tup2)"
+        },
+        {
+            "id": "pc_4",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_5",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_6",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_7",
+            "status": "FAIL",
+            "reason": "Assertion Failed: set(result) == set(test_tup1) & set(test_tup2)"
+        },
+        {
+            "id": "pc_8",
+            "status": "FAIL",
+            "reason": "Assertion Failed: set(result) == set(test_tup1) & set(test_tup2)"
+        },
+        {
+            "id": "pc_9",
+            "status": "FAIL",
+            "reason": "Assertion Failed: set(result) == set(test_tup1) & set(test_tup2)"
+        },
+        {
+            "id": "pc_10",
+            "status": "FAIL",
+            "reason": "Assertion Failed: set(result) == set(test_tup1) & set(test_tup2)"
+        },
+        {
+            "id": "pc_11",
+            "status": "FAIL",
+            "reason": "Assertion Failed: set(result) == set(test_tup1) & set(test_tup2)"
+        },
+        {
+            "id": "pc_12",
+            "status": "FAIL",
+            "reason": "Assertion Failed: set(result) == set(test_tup1) & set(test_tup2)"
+        },
+        {
+            "id": "pc_13",
+            "status": "FAIL",
+            "reason": "Assertion Failed: set(result) == set(test_tup1) & set(test_tup2)"
+        },
+        {
+            "id": "pc_14",
+            "status": "FAIL",
+            "reason": "Assertion Failed: set(result) == set(test_tup1) & set(test_tup2)"
+        },
+        {
+            "id": "pc_15",
+            "status": "FAIL",
+            "reason": "Assertion Failed: set(result) == set(test_tup1) & set(test_tup2)"
+        }
+    ],
+    "status": "SUCCESS"
+}{
+    "prompt_id": 2,
+    "function_name": "similar_elements",
+    "metric": 93.33333333333333,
+    "details": [
+        {
+            "id": "pc_1",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_2",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_3",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_4",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_5",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_6",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_7",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_8",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_9",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_10",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_11",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_12",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_13",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == test_tup1"
+        },
+        {
+            "id": "pc_14",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_15",
+            "status": "PASS",
+            "reason": null
+        }
+    ],
+    "status": "SUCCESS"
+}{
+    "prompt_id": 3,
+    "function_name": "is_not_prime",
+    "metric": 85.0,
+    "details": [
+        {
+            "id": "pc_1",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_2",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_3",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result is True"
+        },
+        {
+            "id": "pc_4",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result is True"
+        },
+        {
+            "id": "pc_5",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_6",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_7",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_8",
+            "status": "FAIL",
+            "reason": "Implementation Crashed: math domain error"
+        },
+        {
+            "id": "pc_9",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_10",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_11",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_12",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_13",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_14",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_15",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_16",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_17",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_18",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_19",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_20",
+            "status": "PASS",
+            "reason": null
+        }
+    ],
+    "status": "FAILURE"
+}{
+    "prompt_id": 4,
+    "function_name": "is_not_prime",
+    "metric": 64.70588235294117,
+    "details": [
+        {
+            "id": "pc_1",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result is True"
+        },
+        {
+            "id": "pc_2",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result is True"
+        },
+        {
+            "id": "pc_3",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_4",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_5",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_6",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_7",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_8",
+            "status": "FAIL",
+            "reason": "Unsatisfiable: Max retries exhausted. (Reason: Unable to satisfy assumptions of test_runner. 3 of 3 examples failed a .filter() or assume() condition. Try making your filters or assumes less strict, or rewrite using strategy parameters: st.integers().filter(lambda x: x > 0) fails less often (that is, never) when rewritten as st.integers(min_value=1).)"
+        },
+        {
+            "id": "pc_9",
+            "status": "FAIL",
+            "reason": "Unsatisfiable: Max retries exhausted. (Reason: Unable to satisfy assumptions of test_runner. 3 of 3 examples failed a .filter() or assume() condition. Try making your filters or assumes less strict, or rewrite using strategy parameters: st.integers().filter(lambda x: x > 0) fails less often (that is, never) when rewritten as st.integers(min_value=1).)"
+        },
+        {
+            "id": "pc_10",
+            "status": "FAIL",
+            "reason": "Unsatisfiable: Max retries exhausted. (Reason: Unable to satisfy assumptions of test_runner. 1 of 1 examples failed a .filter() or assume() condition. Try making your filters or assumes less strict, or rewrite using strategy parameters: st.integers().filter(lambda x: x > 0) fails less often (that is, never) when rewritten as st.integers(min_value=1).)"
+        },
+        {
+            "id": "pc_11",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_12",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_13",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_14",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_15",
+            "status": "FAIL",
+            "reason": "Assertion Failed: isinstance(result, TypeError)"
+        },
+        {
+            "id": "pc_16",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_17",
+            "status": "PASS",
+            "reason": null
+        }
+    ],
+    "status": "SUCCESS"
+}{
+    "prompt_id": 5,
+    "function_name": "heap_queue_largest",
+    "metric": 100.0,
+    "details": [
+        {
+            "id": "pc_1",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_2",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_3",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_4",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_5",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_6",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_7",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_8",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_9",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_10",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_11",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_12",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_13",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_14",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_15",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_16",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_17",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_18",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_19",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_20",
+            "status": "PASS",
+            "reason": null
+        }
+    ],
+    "status": "SUCCESS"
+}{
+    "prompt_id": 6,
+    "function_name": "heap_queue_largest",
+    "metric": 100.0,
+    "details": [
+        {
+            "id": "pc_1",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_2",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_3",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_4",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_5",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_6",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_7",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_8",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_9",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_10",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_11",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_12",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_13",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_14",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_15",
+            "status": "PASS",
+            "reason": null
+        }
+    ],
+    "status": "SUCCESS"
+}{
+    "prompt_id": 7,
+    "function_name": "differ_At_One_Bit_Pos",
+    "metric": 85.0,
+    "details": [
+        {
+            "id": "pc_1",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_2",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_3",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_4",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_5",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_6",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_7",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_8",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_9",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_10",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == True"
+        },
+        {
+            "id": "pc_11",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_12",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_13",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_14",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_15",
+            "status": "FAIL",
+            "reason": "Unsatisfiable: Max retries exhausted. (Reason: Unable to satisfy assumptions of test_runner. 1 of 1 examples failed a .filter() or assume() condition. Try making your filters or assumes less strict, or rewrite using strategy parameters: st.integers().filter(lambda x: x > 0) fails less often (that is, never) when rewritten as st.integers(min_value=1).)"
+        },
+        {
+            "id": "pc_16",
+            "status": "FAIL",
+            "reason": "Unsatisfiable: Max retries exhausted. (Reason: Unable to satisfy assumptions of test_runner. 2000 of 2000 examples failed a .filter() or assume() condition. Try making your filters or assumes less strict, or rewrite using strategy parameters: st.integers().filter(lambda x: x > 0) fails less often (that is, never) when rewritten as st.integers(min_value=1).)"
+        },
+        {
+            "id": "pc_17",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_18",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_19",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_20",
+            "status": "PASS",
+            "reason": null
+        }
+    ],
+    "status": "SUCCESS"
+}{
+    "prompt_id": 8,
+    "function_name": "differ_At_One_Bit_Pos",
+    "metric": 73.33333333333333,
+    "details": [
+        {
+            "id": "pc_1",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_2",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_3",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_4",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_5",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_6",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_7",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_8",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == True"
+        },
+        {
+            "id": "pc_9",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == False"
+        },
+        {
+            "id": "pc_10",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_11",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_12",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_13",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_14",
+            "status": "FAIL",
+            "reason": "Unsatisfiable: Max retries exhausted. (Reason: Unable to satisfy assumptions of test_runner. 2000 of 2000 examples failed a .filter() or assume() condition. Try making your filters or assumes less strict, or rewrite using strategy parameters: st.integers().filter(lambda x: x > 0) fails less often (that is, never) when rewritten as st.integers(min_value=1).)"
+        },
+        {
+            "id": "pc_15",
+            "status": "FAIL",
+            "reason": "Unsatisfiable: Max retries exhausted. (Reason: Unable to satisfy assumptions of test_runner. 2000 of 2000 examples failed a .filter() or assume() condition. Try making your filters or assumes less strict, or rewrite using strategy parameters: st.integers().filter(lambda x: x > 0) fails less often (that is, never) when rewritten as st.integers(min_value=1).)"
+        }
+    ],
+    "status": "SUCCESS"
+}{
+    "prompt_id": 9,
+    "function_name": "find_char_long",
+    "metric": 85.0,
+    "details": [
+        {
+            "id": "pc_1",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_2",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_3",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_4",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_5",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_6",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_7",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_8",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_9",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_10",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_11",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_12",
+            "status": "FAIL",
+            "reason": "Unsatisfiable: Max retries exhausted. (Reason: Unable to satisfy assumptions of test_runner. 2000 of 2000 examples failed a .filter() or assume() condition. Try making your filters or assumes less strict, or rewrite using strategy parameters: st.integers().filter(lambda x: x > 0) fails less often (that is, never) when rewritten as st.integers(min_value=1).)"
+        },
+        {
+            "id": "pc_13",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_14",
+            "status": "FAIL",
+            "reason": "Unsatisfiable: Max retries exhausted. (Reason: Unable to satisfy assumptions of test_runner. 2000 of 2000 examples failed a .filter() or assume() condition. Try making your filters or assumes less strict, or rewrite using strategy parameters: st.integers().filter(lambda x: x > 0) fails less often (that is, never) when rewritten as st.integers(min_value=1).)"
+        },
+        {
+            "id": "pc_15",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_16",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_17",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == ['text']"
+        },
+        {
+            "id": "pc_18",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_19",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_20",
+            "status": "PASS",
+            "reason": null
+        }
+    ],
+    "status": "SUCCESS"
+}{
+    "prompt_id": 10,
+    "function_name": "find_char_long",
+    "metric": 46.666666666666664,
+    "details": [
+        {
+            "id": "pc_1",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == re.findall(r'\\b\\w{4}\\b', text)"
+        },
+        {
+            "id": "pc_2",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_3",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_4",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_5",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == re.findall(r'\\b\\w{4}\\b', text)"
+        },
+        {
+            "id": "pc_6",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == re.findall(r'\\b\\w{4}\\b', text)"
+        },
+        {
+            "id": "pc_7",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_8",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_9",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == re.findall(r'\\b\\w{4}\\b', text)"
+        },
+        {
+            "id": "pc_10",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_11",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == re.findall(r'\\b\\w{4}\\b', text)"
+        },
+        {
+            "id": "pc_12",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == re.findall(r'\\b\\w{4}\\b', text)"
+        },
+        {
+            "id": "pc_13",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == re.findall(r'\\b\\w{4}\\b', text)"
+        },
+        {
+            "id": "pc_14",
+            "status": "PASS",
+            "reason": null
+        },
+        {
+            "id": "pc_15",
+            "status": "FAIL",
+            "reason": "Assertion Failed: result == re.findall(r'\\b\\w{4}\\b', text)"
+        }
+    ],
+    "status": "SUCCESS"
+}
