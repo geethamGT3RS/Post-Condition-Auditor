@@ -27,7 +27,7 @@ if os.path.exists(env_path):
 
 #Set API Key
 #set the .env location to read the API key
-API_KEY1="AIzaSyD01nCSD5c5RyVB-4YF4MkzI5Iz5SsmgGw"
+API_KEY1="AIzaSyCzxQq5cWOvTpa3zSnVEnAahng0FLGDXQU"
 API_KEY = API_KEY1
 if not API_KEY:
     API_KEY = os.environ.get("GEMINI_API_KEY")
