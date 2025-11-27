@@ -705,6 +705,7 @@ def getFunctionCodeAndNameFromPromptID(prompt_id: int) -> tuple[str | None, str 
 
     # print("Connected to MongoDB!")
     # Fetch the prompt document from the FunctionPrompts collection
+    # print("Prompt ID:", prompt_id)
     prompt_document = prompts_collection.find_one({"Prompt_ID": prompt_id})
     if not prompt_document:
         client.close()
@@ -725,12 +726,14 @@ def getFunctionCodeAndNameFromPromptID(prompt_id: int) -> tuple[str | None, str 
         raise ValueError(f"Function_Code not found in function with ID {function_id}.")
     # get the first assertstatement from the Function_Test_Cases list in the function document
     assert_statements = function_document.get("Function_Test_Cases", [])
+    # print("Assert statements:", assert_statements)
     if not assert_statements:
         function_name = get_function_name(function_code) if function_code else None
     else:
         first_test_case = assert_statements[0]
         # print("First test case:", first_test_case)
         function_name = get_function_name_ast(first_test_case) if first_test_case else None
+        # print("Function Name:", function_name)
     #close the connection
     client.close()
     # print("Connection to MongoDB closed.")
@@ -837,9 +840,10 @@ def save_structured_response(prompt_id: int, structured_response: str) -> None:
 #main function for testing
 if __name__ == "__main__":
     # testing for getFunctionCodeAndNameFromPromptID
+    prompt_id = 150
     try:
-        function_name, function_code = getFunctionCodeAndNameFromPromptID(7)
-        print("Function Name:", function_name)
-        print("Function Code:", function_code)
+        function_name, function_code = getFunctionCodeAndNameFromPromptID(prompt_id)
+        print(f"Function Name of the prompt# {prompt_id}:", function_name)
+        print(f"Function Code of the prompt# {prompt_id}:", function_code)
     except Exception as e:
         print("Error:", e)

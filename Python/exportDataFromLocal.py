@@ -2,10 +2,11 @@ import pymongo
 import json
 import sys
 import os
+from config import get_db_client
 
 # --- Configuration ---
-LOCAL_CONNECTION_STRING = "mongodb://localhost:27017/"
-DATABASE_NAME = "PostconditionsDB"
+# LOCAL_CONNECTION_STRING = "mongodb://localhost:27017/"
+# DATABASE_NAME = "PostconditionsDB"
 # List all collections you want to export
 COLLECTION_NAMES = ["FunctionPrompts", "Functions", "SanitizedMBPPProblemSet"]
 EXPORT_DIR = "./Data"
@@ -25,10 +26,9 @@ def export_data():
 
     try:
         # Connect to local MongoDB
-        client = pymongo.MongoClient(LOCAL_CONNECTION_STRING)
-        db = client[DATABASE_NAME]
-        print(f"Connected to local DB: {DATABASE_NAME}")
-
+        client, db = get_db_client()
+        print(f"Connected to local DB: {db.name}")
+    
         total_exported = 0
 
         # Loop through each collection name
@@ -66,7 +66,7 @@ def export_data():
         print(f"All files are saved in the '{EXPORT_DIR}' directory.")
 
     except pymongo.errors.ConnectionFailure as e:
-        print(f"Error: Could not connect to local MongoDB at {LOCAL_CONNECTION_STRING}.")
+        print(f"Error: Could not connect to the MongoDB.")
         print("Please ensure your local MongoDB server is running.")
         sys.exit(1)
     except Exception as e:
@@ -79,4 +79,3 @@ def export_data():
 
 if __name__ == "__main__":
     export_data()
-

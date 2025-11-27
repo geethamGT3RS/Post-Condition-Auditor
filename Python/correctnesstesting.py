@@ -49,7 +49,8 @@ accepted_errors = [
     "Infinite Loop Detected",
     "integer modulo by zero",
     "maximum recursion depth exceeded",
-    "Max retries exhausted"
+    "Max retries exhausted",
+    "Assertion Failed:"
 ]
 # ======================================================
 # 1. STRATEGY FACTORY (The Builder)
@@ -1147,8 +1148,8 @@ def run_audit_for_multiple_prompts(min_prompt_id: int, max_prompt_id: int):
 
 #main function for testing
 if __name__ == "__main__":
-    # Example usage: run audit for prompt IDs 1 to 240
-    run_audit_for_multiple_prompts(1,10)
+    # Example usage: run audit for prompt IDs 21 to 200
+    run_audit_for_multiple_prompts(21,200)
 
 
 # # ==========================================

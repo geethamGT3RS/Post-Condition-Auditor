@@ -8,6 +8,43 @@ from config import get_db_client
 import createPYFiles
 from pymongo.errors import ConnectionFailure
 
+# Function to delete functions greater than a certain ID
+def delete_functions_greater_than():
+    """
+    Deletes functions from the Functions collection with Function_ID greater than max_id.
+    Example usage:
+    delete_functions_greater_than()
+    """
+    client, db = get_db_client()
+    functions_collection = db["Functions"]
+    
+    #run a loop to get valid max_id from user and handle invalid input (including a number greater than existing max Function_ID)
+    while True:
+        try:
+            existing_max_id = functions_collection.find_one(sort=[("Function_ID", -1)])["Function_ID"]
+            print(f"Existing max Function_ID is: {existing_max_id}")
+            break
+        except Exception as e:
+            print(f"Error retrieving existing max Function_ID: {e}")
+            return
+
+    while True:
+        try:
+            max_id = int(input("Provide the max number of functions to keep (Function_ID <= max_id): "))
+            if max_id > existing_max_id:
+                print(f"Invalid input. Please enter a number less than or equal to the existing max Function_ID ({existing_max_id}).")
+            else:
+                break
+        except ValueError:
+            print("Invalid input. Please enter a valid integer.")
+    
+    # Delete functions with Function_ID greater than max_id
+    result = functions_collection.delete_many({"Function_ID": {"$gt": max_id}})
+    print(f"Deleted {result.deleted_count} functions with Function_ID greater than {max_id}.")
+    client.close()
+    # print("Connection to MongoDB closed.")
+
+
 # Prune problematic functions from the collection
 def prune_problematic_functions():
     """
@@ -20,7 +57,7 @@ def prune_problematic_functions():
 
     # Create the list of Function_IDs to be removed
     problematic_function_ids = [
-        # 28,39,75
+        75
         ]
 
     # Remove problematic functions
@@ -94,6 +131,11 @@ def initializeFunctionsCollection():
             # Add other fields as necessary
         })
     print(f"Transformed dataset into '{functions_collection_name}' collection with {num_of_records} records.")
+    
+    #reduce the Functions collection to only first N functions based on user input
+    delete_functions_greater_than()
+    
+    # Optionally, prune problematic functions
     prune_problematic_functions()
     # Close the connection when done
     client.close()

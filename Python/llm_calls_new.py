@@ -27,13 +27,10 @@ if os.path.exists(env_path):
 
 #Set API Key
 #set the .env location to read the API key
-API_KEY1="AIzaSyBHZTgXlzA1LvkPSV7OwnsIRHAXv5phlUc"
-API_KEY2="AIzaSyBgSkpBxN9snTdvVHLU0hjjpsXwZBoKf74"
+API_KEY1="AIzaSyD01nCSD5c5RyVB-4YF4MkzI5Iz5SsmgGw"
 API_KEY = API_KEY1
 if not API_KEY:
     API_KEY = os.environ.get("GEMINI_API_KEY")
-if not API_KEY:
-    API_KEY = API_KEY2
 # API_KEY = os.environ.get("GEMINI_API_KEY")
 if not API_KEY:
     API_KEY = "AIzaSyBgSkpBxN9snTdvVHLU0hjjpsXwZBoKf74" 
@@ -1022,7 +1019,7 @@ class PostconditionPipeline:
         for attempt in range(self.max_retries):
             try:
                 format_prompt = f"""
-        Here is the previous analysis for post-conditions of a Python function {func_name}:
+        Here is the previous analysis for Property-Based Testing (PBT) of a Python function {func_name}:
         {raw_reasoning}
 
         Role : You are an expert in automated testing and test case generation for Python functions using property based testing.
@@ -1568,10 +1565,10 @@ if __name__ == "__main__":
     # Example usage: Process Prompt_IDs from 1 to 100 
     # run_postcondition_updates_all(21, 50)
     min_prompt_id = 1
-    max_prompt_id = 10
+    max_prompt_id = 299
 
-    for i in range(min_prompt_id, max_prompt_id + 1):
-        reset_intermediate_fields(i)
+    # for i in range(min_prompt_id, max_prompt_id + 1):
+    #     reset_intermediate_fields(i)
 
     run_postcondition_updates_all(min_prompt_id, max_prompt_id)
 
@@ -1582,7 +1579,11 @@ if __name__ == "__main__":
     empty_test_cases_count = 0
     empty_raw_reasoning_count = 0
     for prompt_id in range(min_prompt_id, max_prompt_id + 1):
-        prompt_document = getPromptbyPromptID(prompt_id)
+        try:
+            prompt_document = prompts_collection.find_one({"Prompt_ID": prompt_id})
+        except Exception as e:
+            print(f"Error retrieving prompt for ID {prompt_id}: {e}")
+            continue
         if prompt_document is None:
             print(f"No prompt found for ID {prompt_id}, skipping...")
             continue

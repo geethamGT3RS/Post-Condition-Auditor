@@ -1,3 +1,4 @@
+from random import random
 from pymongo import MongoClient
 from config import get_db_client
 import Prompts
@@ -108,11 +109,14 @@ def generateFewShotPrompt(function_id, num_examples=3):
     
     while len(example_documents) < num_examples and attempts < max_attempts:
         attempts += 1
-        random_example = list(Prompts_collection.aggregate([ 
+
+        # Fetch a random example document having non-empty test_cases and raw_reasoning and Correctness_Score as 1.0
+        random_example = Prompts_collection.aggregate([ 
             {
                 "$match": {
-                    "Post_Conditions": {"$exists": True, "$ne": []},
-                    "Function_ID": {"$ne": function_id}
+                    "test_cases": {"$exists": True, "$ne": []},
+                    "raw_reasoning": {"$exists": True, "$ne": []},
+                    "Correctness_Score": 1.0
                 }
             }, 
             {"$sample": {"size": 1}},
@@ -120,16 +124,26 @@ def generateFewShotPrompt(function_id, num_examples=3):
                 "$project": {
                     "_id": 0,
                     "Function_ID": 1,
-                    "raw_reasoning": 1
+                    "raw_reasoning": 1,
+                    "Prompt_ID": 1
                 }
             }
-        ]))
+        ])        
         
+        # random_example = list(random_example)
+        if not random_example:
+            continue
+        #get the prompt ID from the cursor
+        random_example = list(random_example)[0]
+        print(random_example)
+
         if random_example:
-            # Check if we already have this example
-            example_func_id = random_example[0]["Function_ID"]
-            if not any(ex.get("Example_Function_ID") == example_func_id for ex in example_documents):
-                example_documents.append(random_example[0])
+            # Check if we already have this example by matching the Prompt_ID
+            example_prompt_id = random_example.get("Prompt_ID", "")
+            if not example_prompt_id:
+                continue
+            if not any(ex.get("Prompt_ID") == example_prompt_id for ex in example_documents):
+                example_documents.append(random_example)
 
     # Fetch the Function_Description for each example document from the Functions collection
     for example in example_documents:
@@ -339,4 +353,5 @@ def generateFewShotPrompts(num_examples=3):
 # main function to test the prompt generation
 if __name__ == "__main__":
     #generateAllPrompts()
-    generateNaivePrompt(210)
+    # generateNaivePrompt(210)
+    generateFewShotPrompts(num_examples=3)
