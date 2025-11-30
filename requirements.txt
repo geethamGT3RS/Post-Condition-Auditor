@@ -8,3 +8,6 @@ google.generativeai
 tenacity
 jsonschema
 func-timeout
+pandas
+matplotlib
+seaborn
