@@ -8,7 +8,7 @@ import os
 
 # Configuration for plot aesthetics
 sns.set_theme(style="whitegrid")
-plt.rcParams['figure.figsize'] = (10, 6)
+plt.rcParams['figure.figsize'] = (12, 8)
 
 def load_scores(filepath):
     """Loads NDJSON (Newline Delimited JSON) file."""
@@ -30,102 +30,108 @@ def load_scores(filepath):
         print("No data found in file.")
         sys.exit(1)
         
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
+    
+    # Ensure Prompt_Strategy column exists, default to 'Unknown' if missing
+    if 'Prompt_Strategy' not in df.columns:
+        df['Prompt_Strategy'] = 'Unknown'
+        
+    return df
 
-def plot_distributions(df, output_dir):
-    """Generates histograms for each score type."""
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+def plot_strategy_comparison(df, output_dir):
+    """Generates box plots comparing metrics across different strategies."""
+    # Melt dataframe for seaborn boxplot format
+    melted_df = df.melt(
+        id_vars=['Prompt_Strategy'], 
+        value_vars=['Mutation_Score', 'Hallucination_Score', 'Correctness_Score'],
+        var_name='Metric', 
+        value_name='Score'
+    )
     
-    score_types = ['Mutation_Score', 'Hallucination_Score', 'Correctness_Score']
-    colors = ['#1f77b4', '#d62728', '#2ca02c'] # Blue, Red, Green
+    plt.figure(figsize=(14, 8))
+    sns.boxplot(x='Metric', y='Score', hue='Prompt_Strategy', data=melted_df, palette='Set2')
     
-    for ax, col, color in zip(axes, score_types, colors):
-        if col in df.columns:
-            sns.histplot(df[col], bins=10, kde=True, ax=ax, color=color)
-            ax.set_title(f'Distribution of {col.replace("_", " ")}')
-            ax.set_xlabel('Score (0.0 - 1.0)')
-            ax.set_ylabel('Count')
-            
-            # Add mean line
-            mean_val = df[col].mean()
-            ax.axvline(mean_val, color='k', linestyle='--', label=f'Mean: {mean_val:.2f}')
-            ax.legend()
-            
+    plt.title('Performance Comparison: Naive vs CoT vs FewShot')
+    plt.ylabel('Score (0.0 - 1.0)')
+    plt.xlabel('Metric')
+    plt.legend(title='Strategy', bbox_to_anchor=(1.05, 1), loc='upper left')
+    
     plt.tight_layout()
-    save_path = os.path.join(output_dir, 'distribution_plots.png')
+    save_path = os.path.join(output_dir, 'strategy_comparison_boxplot.png')
     plt.savefig(save_path)
     print(f"Generated '{save_path}'")
     plt.close()
 
-def plot_correlations(df, output_dir):
-    """Generates a heatmap of correlations."""
-    cols = ['Mutation_Score', 'Hallucination_Score', 'Correctness_Score']
+def plot_pairplot_by_strategy(df, output_dir):
+    """Generates a scatter matrix colored by Prompt Strategy."""
+    cols = ['Mutation_Score', 'Hallucination_Score', 'Correctness_Score', 'Prompt_Strategy']
     # Filter only existing columns
     cols = [c for c in cols if c in df.columns]
     
-    if len(cols) < 2:
-        return
-
-    plt.figure(figsize=(8, 6))
-    corr = df[cols].corr()
+    pair_plot = sns.pairplot(df[cols], hue='Prompt_Strategy', palette='Set2', diag_kind='kde')
+    pair_plot.fig.suptitle('Pairwise Relationships by Strategy', y=1.02)
     
-    sns.heatmap(corr, annot=True, cmap='coolwarm', vmin=-1, vmax=1, center=0, fmt='.2f')
-    plt.title('Correlation Matrix of Scores')
-    plt.tight_layout()
-    save_path = os.path.join(output_dir, 'correlation_heatmap.png')
+    save_path = os.path.join(output_dir, 'pair_plot_strategy.png')
     plt.savefig(save_path)
     print(f"Generated '{save_path}'")
     plt.close()
 
-def plot_pairplot(df, output_dir):
-    """Generates a scatter matrix."""
-    cols = ['Mutation_Score', 'Hallucination_Score', 'Correctness_Score']
-    cols = [c for c in cols if c in df.columns]
-    
-    # Add a 'Cluster' column based on Correctness for coloring if it helps visualization
-    plot_df = df[cols].copy()
-    plot_df['Outcome'] = plot_df['Correctness_Score'].apply(lambda x: 'High' if x > 0.8 else ('Low' if x < 0.2 else 'Med'))
-    
-    pair_plot = sns.pairplot(plot_df, hue='Outcome', palette='viridis', diag_kind='kde')
-    pair_plot.fig.suptitle('Pairwise Relationships between Scores', y=1.02)
-    
-    save_path = os.path.join(output_dir, 'pair_plot.png')
-    plt.savefig(save_path)
-    print(f"Generated '{save_path}'")
-    plt.close()
-
-def plot_3d_scatter(df, output_dir):
-    """Generates a 3D scatter plot."""
+def plot_3d_scatter_strategy(df, output_dir):
+    """Generates a 3D scatter plot colored by Strategy."""
     cols = ['Mutation_Score', 'Hallucination_Score', 'Correctness_Score']
     if not all(c in df.columns for c in cols):
         return
 
-    fig = plt.figure(figsize=(10, 8))
+    fig = plt.figure(figsize=(12, 10))
     ax = fig.add_subplot(111, projection='3d')
 
-    # Color by Correctness
-    sc = ax.scatter(
-        df['Mutation_Score'], 
-        df['Hallucination_Score'], 
-        df['Correctness_Score'],
-        c=df['Correctness_Score'], 
-        cmap='viridis',
-        s=60, 
-        edgecolor='w'
-    )
+    # Map strategies to colors manually for consistent legend
+    strategies = df['Prompt_Strategy'].unique()
+    colors = sns.color_palette('Set2', n_colors=len(strategies))
+    strategy_color_map = dict(zip(strategies, colors))
+
+    for strategy in strategies:
+        subset = df[df['Prompt_Strategy'] == strategy]
+        ax.scatter(
+            subset['Mutation_Score'], 
+            subset['Hallucination_Score'], 
+            subset['Correctness_Score'],
+            c=[strategy_color_map[strategy]],
+            label=strategy,
+            s=60, 
+            edgecolor='w'
+        )
 
     ax.set_xlabel('Mutation Score')
     ax.set_ylabel('Hallucination Score')
     ax.set_zlabel('Correctness Score')
-    ax.set_title('3D View of Scores')
-    
-    cbar = plt.colorbar(sc, ax=ax, shrink=0.5, aspect=5)
-    cbar.set_label('Correctness Score')
+    ax.set_title('3D View of Scores by Strategy')
+    ax.legend(title="Prompt Strategy")
 
-    save_path = os.path.join(output_dir, '3d_scatter.png')
+    save_path = os.path.join(output_dir, '3d_scatter_strategy.png')
     plt.savefig(save_path)
     print(f"Generated '{save_path}'")
     plt.close()
+
+def print_summary_stats(df):
+    """Prints a statistical summary table to console."""
+    print("\n" + "="*50)
+    print("AVERAGE SCORES BY STRATEGY")
+    print("="*50)
+    
+    # Group by strategy and calculate mean
+    summary = df.groupby('Prompt_Strategy')[
+        ['Mutation_Score', 'Hallucination_Score', 'Correctness_Score']
+    ].mean()
+    
+    print(summary)
+    print("-" * 50)
+    
+    # Calculate counts to see sample sizes
+    counts = df['Prompt_Strategy'].value_counts()
+    print("\nSample Counts per Strategy:")
+    print(counts)
+    print("="*50 + "\n")
 
 def main():
     filename = './Data/scores.json'
@@ -142,19 +148,15 @@ def main():
     print("Loading data...")
     df = load_scores(filename)
     
-    print("-" * 30)
-    print("Data Summary:")
-    print("-" * 30)
-    print(df[['Mutation_Score', 'Hallucination_Score', 'Correctness_Score']].describe())
-    print("-" * 30)
+    # Print numerical analysis
+    print_summary_stats(df)
 
     print("Generating plots...")
-    plot_distributions(df, output_dir)
-    plot_correlations(df, output_dir)
-    plot_pairplot(df, output_dir)
-    plot_3d_scatter(df, output_dir)
+    plot_strategy_comparison(df, output_dir)
+    plot_pairplot_by_strategy(df, output_dir)
+    plot_3d_scatter_strategy(df, output_dir)
     
-    print(f"\nVisualization complete. Check the '{output_dir}' folder.")
+    print(f"Visualization complete. Check the '{output_dir}' folder.")
 
 if __name__ == "__main__":
     main()
